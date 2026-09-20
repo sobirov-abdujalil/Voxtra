@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Voxtra — VoxDrill</title>
+  </head>
+  <body>
+    <main id="app">
+      <h1>VoxDrill: Warehouse Chemical Spill</h1>
+      <p id="status" role="status">Initializing…</p>
+      <section>
+        <button id="start-session" type="button">Start drill session</button>
+        <button id="start-voice" type="button" disabled>Start voice</button>
+        <button id="stop-voice" type="button" disabled>Stop voice</button>
+      </section>
+      <section>
+        <h2>Current state</h2>
+        <pre id="state">No session yet.</pre>
+      </section>
+      <section>
+        <h2>Send intent (text fallback / debug)</h2>
+        <div id="intents"></div>
+      </section>
+      <section>
+        <h2>Consequence</h2>
+        <p id="consequence">—</p>
+      </section>
+      <section>
+        <h2>After-action report</h2>
+        <button id="load-report" type="button" disabled>Load report</button>
+        <pre id="report">—</pre>
+      </section>
+    </main>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

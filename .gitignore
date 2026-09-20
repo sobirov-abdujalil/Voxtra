@@ -1,0 +1,27 @@
+# Secrets — never commit
+.env
+.env.*
+
+# Keep the template committed
+!.env.example
+
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+.next/
+coverage/
+playwright-report/
+test-results/
+
+# Logs & temp
+logs/
+*.log
+*.tmp
+.DS_Store
+Thumbs.db
+
+# Local tooling
+.opencode/sessions/
