@@ -6,4 +6,4 @@
 - 2026-09-20: Wrote `AGENTS.md`, `.env.example`, hardened `.gitignore`.
 - 2026-09-20: Scaffolded npm-workspace monorepo (server/web/scenarios/tests), deterministic engine, Warehouse Chemical Spill definition, API routes, web skeleton.
 - 2026-09-20: Verified AssemblyAI Voice Agent integration against official docs (token endpoint, browser WS flow, session.update, interruption, resumption); recorded in `docs/architecture.md`.
-- 2026-09-20: Wrote docs (product/architecture/decisions/roadmap/demo-script/test-plan/competition) + README + project-state files.
+- 2026-09-20: All gates green (build/typecheck/lint/23 tests/audit 0 vulns/live smoke); removed 2 stale verbatim ECC agent copies; initial commit 9828cb9 (no remote → not pushed).
