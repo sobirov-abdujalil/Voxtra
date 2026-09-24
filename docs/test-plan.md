@@ -204,20 +204,24 @@ Chromium with mic permission; also re-checkable with the text intent buttons.
   (16-bit PCM mono 22050 Hz; Zira voice, rate -1; lines listed in the script).
 - Chained drill track: `python3 e2e/fixtures/audio/build-drill.py`
   (6s lead silence for the greeting + 4s gaps between utterances for turn detection +
-  8s trailing silence → `drill-full.wav`, ~44s, now including 04-document-incident).
+  150s trailing silence → `drill-full.wav`, 186.5s measured 2026-09-24, now including 04-document-incident).
 - Forklift fixtures: `powershell -ExecutionPolicy Bypass -File e2e/fixtures/audio/forklift/generate.ps1`
   (5 single-sentence lines — 2026-09-22: two-sentence phrasing split turns at the
   mid-utterance period, so each line is one sentence: secure/call/notify/preserve/document)
   then `python3 e2e/fixtures/audio/forklift/build-forklift.py`
   (10s gaps so the 14-intent agent's reply finishes and each turn closes in order;
-  90s tail so Chromium's file-replay never pollutes the measured window →
-  `e2e/fixtures/audio/forklift/forklift-drill.wav`, ~153s).
-  Warehouse tail likewise extended to 90s (`drill-full.wav`, ~126.5s; gaps stay 4s).
+  150s tail so Chromium's file-replay never pollutes the measured window →
+  `e2e/fixtures/audio/forklift/forklift-drill.wav`, 213.0s measured 2026-09-24).
+  Warehouse tail likewise extended to 150s (`drill-full.wav`, 186.5s; gaps stay 4s).
+  Tail history: 90s (2026-09-22) → 150s (2026-09-24, after run 3 outlasted the
+  126.5s/153s files and replayed: warehouse double-pass, forklift
+  post-completion turn — see `project-state/REGRESSIONS.md`). Tails stay below
+  the 240s per-spec E2E poll deadline.
 - Equipment fixtures: `powershell -ExecutionPolicy Bypass -File e2e/fixtures/audio/equipment/generate.ps1`
   (5 single-sentence lines: estop/isolate/evacuate/verify/document)
   then `python3 e2e/fixtures/audio/equipment/build-equipment.py`
-  (6s lead + 10s gaps + 90s tail → `e2e/fixtures/audio/equipment/equipment-drill.wav`, ~151s,
-  same hardening as the Forklift track).
+  (6s lead + 10s gaps + 150s tail → `e2e/fixtures/audio/equipment/equipment-drill.wav`, 211.0s measured
+  2026-09-24, same hardening as the Forklift track).
 - The WAVs are committed test fixtures (not secrets).
 
 ## Pre-demo command (run from C:\Voxtra before the demo; repeatable, exits non-zero on failure)

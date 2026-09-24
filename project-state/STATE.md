@@ -1,6 +1,6 @@
 # STATE.md — Voxtra current status (honest, updated 2026-09-24)
 
-PROJECT COMPLETION: 74% (no change — lock-in attempt did not pass; M5 deployment + M6 unclaimed — no URL)
+PROJECT COMPLETION: 74% (no change — Task 14 is diagnosis + hardening, no milestone weight; M5 deployment + M6 unclaimed — no URL)
 
 ## Completion ledger
 
@@ -32,6 +32,35 @@ as a separate Foundation row in the roadmap (see the 2026-09-23 entry in
 verified but no public URL exists and the deployed E2E has not run — claiming M5
 credit now would inflate. On go-live with `BASE_URL=<url> npm run e2e` green
 (Warehouse 58/58 + Forklift 57/57 + Equipment 65/65), credit M5 partial per `docs/roadmap.md` and recompute here.)
+
+## Status: TASK 14 FORKLIFT DIAGNOSIS 2026-09-24 — NOT a product regression; tag NO-GO, Path B
+
+- Safety net first: commit 8c37bb7 (Tasks 2–13 tree, no tag, no push, no
+  remote; `_sources/` left untracked; scans clean). Then diagnosis.
+- Diagnosis (`docs/release-decision.md`, evidence-backed A–D): Task 9 prompt
+  fix INTACT at runtime (quoted from live agent-config); fixture tails
+  intact on disk (153.0/126.5/151.0s); scenario JSON unchanged; every heard
+  utterance in all runs mapped correctly. Primary cause =
+  environmental/service-side turn-skip/reorder under load (heard orders
+  01,03,04,01,02…; wall-clock 2–3x inflated; CPU 44–57%, ICMP resource
+  exhaustion). Secondary confirmed harness cliff: run 3 (9m01s) outlasted
+  the fixtures → warehouse 10-turn double-pass + forklift perfect-5-plus-
+  post-replay. No product-code change made (none warranted).
+- Fixes: `e2e/preflight.ts` + `global-setup.ts` abort gate (`npm run
+  preflight`; thresholds CPU 85%/TCP/3000ms/5GB; no-op without key) with
+  `server/tests/preflight.test.ts` (8 tests; manual FIT EXIT 0 + forced
+  abort EXIT 1); tails 90s→150s on all tracks (186.5/213.0/211.0s, under the
+  240s poll deadline) via documented scripts; retries refused (decisions.md).
+- Post-fix runs: run 1 5/5 green 4m04s; run 2 4/5 6m30s (equipment 8-turn);
+  run 3 2/5 9m01s (degraded, cliff confirmed); run 4 4/5 6m50s (new tails;
+  forklift 57/57 3rd green, warehouse green, equipment 6-turn line-02 skip).
+  Full-green 1/4, legs 15/20 (75%). Deterministic gates green every run
+  (build/typecheck/lint 0; server 141/141; web 34/34; audit 0).
+- Release decision: tag NO-GO (criterion: both runs green or ≥90% legs —
+  1/4, 75%), Path B (localhost video primary). Flip condition: green
+  `submission-check` Sept 29. No v1.0.0 tag, no RELEASE.md, no release
+  commit. Raw logs `release/verification-2026-09-24-task14-run{1..4}.txt`
+  (git-ignored). M5 (14) + M6 (15) unclaimed; 74% unchanged (no inflation).
 
 ## Status: SUBMISSION LOCK-IN ATTEMPTED 2026-09-24 — NO TAG (tripwire red); M5 DEPLOY STILL BLOCKED
 
@@ -101,14 +130,15 @@ credit now would inflate. On go-live with `BASE_URL=<url> npm run e2e` green
   `server/src/voice/tools.ts` + `buildGreeting`). Warehouse prompt + schema byte-stable,
   Forklift prompt + guide untouched (both pinned by tests).
 - Fixtures: `e2e/fixtures/audio/equipment/` (5 SAPI single-sentence per-line WAVs +
-  `equipment-drill.wav` ~151s via `build-equipment.py`: 6s lead, 10s gaps, 90s tail);
+  `equipment-drill.wav` 211.0s measured 2026-09-24 via `build-equipment.py`: 6s lead, 10s gaps, 150s tail);
   generation commands in `docs/test-plan.md`.
 - E2E: `e2e/voice-loop-equipment.spec.ts` (live golden 65/65 with the same categories as
   Warehouse/Forklift + report-breakdown assert, plus deterministic API invalid-path:
   enter_cell −15 no-transition then reassess recovery); `playwright.config.ts`
   `testMatch: /voice-loop.*\.spec\.ts/` runs all three; all specs skip cleanly without a key.
 - Fixtures: `e2e/fixtures/audio/forklift/` (5 SAPI per-line WAVs + `forklift-drill.wav`
-  ~49s via `build-forklift.py`); generation commands in `docs/test-plan.md`.
+  213.0s measured 2026-09-24 via `build-forklift.py`: 6s lead + 10s gaps + 150s tail —
+  tail extended from 90s after Task 14 run 3 outlasted the 153s file); generation commands in `docs/test-plan.md`.
 - E2E: `e2e/voice-loop-forklift.spec.ts` (live golden 57/57 with the same categories as
   Warehouse + report-breakdown assert, plus deterministic API invalid-path:
   move_victim −12 no-transition then reassess recovery); `playwright.config.ts`

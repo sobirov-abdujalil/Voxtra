@@ -83,8 +83,7 @@
   submission-checklist + demo-recording and recompute STATE (M5 deployment 14).
   Recording package is ready now: localhost take per `docs/demo-recording.md`;
   re-record only the outro if the URL lands before September 29.
-- [x] Submission lock-in attempt (2026-09-24, NO TAG — verification red):
-  full pass captured to `release/verification-2026-09-24.txt` (deterministic
+- [x] Submission lock-in attempt (2026-09-24, NO TAG — verification red):  full pass captured to `release/verification-2026-09-24.txt` (deterministic
   gates green: build/typecheck/lint 0, server 133/133, web 34/34, audit 0,
   secret + bundle scans clean, smoke ×2; predemo EXIT 1 twice — 4/5 then 3/5,
   forklift golden 0/2, equipment 1/2, legs 7/10). Per constraints no v1.0.0
@@ -94,3 +93,19 @@
   absent); `.gitignore` covers `release/verification-*.txt`. No URL this
   turn: M5 deployment (14) + M6 (15) unclaimed, 74% unchanged. Docs +
   project-state + release summary only; no code changed.
+- [x] Forklift-recurrence diagnosis + hardening (2026-09-24, Task 14, tag
+  NO-GO — Path B): safety-net commit 8c37bb7 first (no tag/push); evidence
+  diagnosis (prompt fix intact at runtime, tails intact, scenario unchanged,
+  every heard utterance mapped correctly → primary cause
+  environmental/service-side turn-skip/reorder, secondary confirmed replay
+  cliff in degraded run 3); mitigations (`e2e/preflight.ts` + global-setup
+  abort gate + 8 unit tests, tails 90s→150s with regenerated WAVs, retries
+  refused); predemo 4x post-fix (5/5 4m04s, 4/5 6m30s, 2/5 9m01s, 4/5 6m50s —
+  forklift golden 3/4 greens; legs 15/20); `docs/release-decision.md` written
+  (tag NO-GO, Path B, Sept-29 flip condition); submit-now/checklist/
+  demo-recording/BLOCKERS/REGRESSIONS/STATE/decisions updated. No URL: M5
+  (14) + M6 (15) unclaimed, 74% unchanged. No engine/scenario/prompt change.
+- [ ] NEXT: September 29 evening — `npm run submission-check` on a calm
+  machine (tag flips to go only on green → v1.0.0 + RELEASE.md + commit);
+  record the localhost demo video per `docs/demo-recording.md` (preflight
+  FIT first, best of three takes). Deploy gate still needs the user (BLOCKERS.md).

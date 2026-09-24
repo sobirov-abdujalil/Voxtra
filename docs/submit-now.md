@@ -16,10 +16,15 @@ Equipment 65/65, both invalid-paths). If predemo flakes, see fallback below —
 do not weaken any assertion. Also: no secret in the demo video (mic audio
 only; never show `.env` or Render dashboard secrets on screen).
 
-Tripwire state 2026-09-24: E2E legs 7/10 (70%), full predemo 0/2 — below
-live-demo acceptability. **The pre-recorded localhost video is the PRIMARY
-artifact; do not rely on a live URL.** Re-run `submission-check` on Sept 29
-and log any flake with its turn log in `project-state/REGRESSIONS.md`.
+Tripwire state 2026-09-24 (Task 14 decision, see `docs/release-decision.md`):
+post-fix runs 1/4 full-green, E2E legs 15/20 (75%) — forklift golden green
+3/4 (4th a perfect 5 plus one post-replay); residual classified
+environmental/service-side, NOT product (prompt fix intact at runtime,
+fixtures verified, every heard utterance mapped correctly). Mitigations:
+`npm run preflight` abort gate + 150s fixture tails. **The pre-recorded
+localhost video is the PRIMARY artifact; do not rely on a live URL.**
+Re-run `submission-check` on Sept 29 (tag flips to go only on green) and log
+any flake with its turn log in `project-state/REGRESSIONS.md`.
 
 ## Path A — deployed URL available
 

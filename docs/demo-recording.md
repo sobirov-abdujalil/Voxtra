@@ -33,6 +33,9 @@ Complete every line before the first recorded take:
       auto-update paused, screensaver disabled.
 - [ ] Network: wired connection preferred; on Wi-Fi, confirm signal strength
       before recording (the voice loop is a live AssemblyAI round-trip).
+- [ ] Preflight: `npm run preflight` → FIT before the first take (Task-14
+      gate: CPU/TCP/disk check; an UNFIT reading means re-take later, not a
+      product failure — close background load and retry).
 - [ ] Terminal: a second window ready with `npm run predemo` and the server
       start command (`npm run build --workspaces` then
       `npm run start --workspace=server`) so a re-take is fast.

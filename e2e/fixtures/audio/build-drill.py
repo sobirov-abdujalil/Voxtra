@@ -7,11 +7,13 @@ Input: 02-isolate-area + 03-notify-supervisor + 05-inspect-label
 lets the agent greeting finish before the first utterance).
 Output: e2e/fixtures/audio/drill-full.wav (16-bit PCM mono, 22050 Hz).
 
-Timing (2026-09-22 loop hardening): Chromium replays the capture file when it
-ends, and any replayed utterance becomes a spurious post-completion turn that
-breaks the exactly-5 assertion. The 90s tail keeps the whole drill plus the
-12s settle plus report/shutdown inside the first pass under observed agent
-pacing. Gaps stay 4s (the 8-intent Warehouse agent round-trips inside them).
+Timing (2026-09-22 loop hardening, extended 2026-09-24): Chromium replays the
+capture file when it ends, and any replayed utterance becomes a spurious
+post-completion turn that breaks the exactly-5 assertion. The 150s tail keeps
+the whole drill plus the 12s settle plus report/shutdown inside the first pass
+even when a degraded window pushes a spec past ~3min (2026-09-24 run 3:
+warehouse double-pass after outlasting the 126.5s tail). Gaps stay 4s (the
+8-intent Warehouse agent round-trips inside them).
 """
 import pathlib
 import wave
@@ -41,7 +43,7 @@ parts = [
     read('04-document-incident.wav'),
     silence(4.0),
     read('01-clean-it-up.wav'),
-    silence(90.0),
+    silence(150.0),
 ]
 out = HERE / 'drill-full.wav'
 with wave.open(str(out), 'wb') as w:

@@ -16,6 +16,9 @@ const isDeployed = Boolean(process.env.BASE_URL) && !process.env.BASE_URL.includ
 export default defineConfig({
   testDir: '.',
   testMatch: /voice-loop.*\.spec\.ts/,
+  // Pre-flight gate (2026-09-24 Forklift diagnosis): aborts legibly on an
+  // unfit machine instead of producing a false red. No-op without a key.
+  globalSetup: './global-setup.ts',
   timeout: 300_000,
   expect: { timeout: 30_000 },
   fullyParallel: false,

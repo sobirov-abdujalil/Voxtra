@@ -11,11 +11,12 @@ Timing (same hardening as the Forklift track): 10s gaps (the Equipment agent
 reasons over 14 intents and speaks a reply per turn — the wider gap lets the
 reply finish and turn detection close each utterance before the next starts,
 so turns cannot queue-jump or barge-in cascade past the pending call) and a
-90s tail (Chromium replays the capture file when it ends, and any replayed
+150s tail (extended 2026-09-24 from 90s, same run-3 evidence as the Forklift
+track: Chromium replays the capture file when it ends, and any replayed
 utterance becomes a spurious post-completion turn that breaks the exactly-5
 assertion — the tail keeps the whole drill plus the 12s settle plus
-report/shutdown inside the first pass under observed agent pacing; the E2E
-stops polling at completion and ignores the tail).
+report/shutdown inside the first pass even in a degraded ~3min/spec window;
+the E2E stops polling at completion and ignores the tail).
 """
 import pathlib
 import wave
@@ -45,7 +46,7 @@ parts = [
     read('04-verify-technician.wav'),
     silence(10.0),
     read('05-document-incident.wav'),
-    silence(90.0),
+    silence(150.0),
 ]
 out = HERE / 'equipment-drill.wav'
 with wave.open(str(out), 'wb') as w:

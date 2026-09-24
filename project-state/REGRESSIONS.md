@@ -231,3 +231,58 @@ regression. E2E legs 7/10 (70%), full predemo 0/2 — below live-demo
 acceptability, so per task constraints NO v1.0.0 tag, NO RELEASE.md, NO
 release commit was created. Pre-recorded demo is PRIMARY; Path B in
 `docs/submit-now.md`. No code changed (freeze honored).
+
+## 2026-09-24 Task 14 Forklift-recurrence diagnosis — NOT a product regression, two mitigations shipped
+
+Diagnosis (full memo `docs/release-decision.md`; raw logs
+`release/verification-2026-09-24-task14-run{1,2,3,4}.txt`, git-ignored):
+
+- Part A (fix present?): INTACT. Live `GET /api/voice/agent-config?
+  scenarioId=forklift-incident` returns the Task 9 rules verbatim (fragment
+  no-fire, immediate-fire, each-step-once, optional-only-on-performance,
+  keep-still→call_emergency + per-intent guide); Warehouse byte-stable. No
+  prompt/schema drift by any later task.
+- Part B (harness?): tails intact on disk (forklift 153.0s incl. 90s tail,
+  drill-full 126.5s, equipment 151.0s; serial workers:1). Task 13's 8/9-turn
+  failures struck mid-drill — tail replay acquitted. BUT Task 14 run 3
+  (9m01s degraded window) confirmed the replay cliff: warehouse spec
+  outlasted its 126.5s file → exact 10-turn double-pass 61/58; forklift
+  turns 1–5 a perfect golden + turn 6 a +0 post-completion replay of line 05.
+- Part C (environment?): CPU 44–57% with Chrome/Roblox/SNAPOS64 load, ICMP
+  socket-resource exhaustion (TCP :443 OK at 110–390ms jitter), wall-clock
+  2–3x inflated (6m47s/9m51s/9m01s vs calm 4m04s and Task 9 155s/160s).
+- Part D (root cause): PRIMARY = environmental/service-side turn-delivery
+  disorder — heard line orders prove it (Task 13 run 1: 01,03,04,01,02,03,
+  04,05; run 4 equipment: 01,03,04,05,01,02 with line-02 skip → 6-turn
+  stall). Every heard utterance in all runs mapped to its correct intent
+  (incl. STT variants "Graphing the scene", "Taking out the power",
+  "11 right now", "He's clear"); engine scored correctly throughout. Zero
+  product-logic defects. No engine/scenario/prompt code changed.
+
+Fixes (smallest, no assertion weakened):
+
+1. `e2e/preflight.ts` + `e2e/global-setup.ts` (wired in
+   `playwright.config.ts`) + `npm run preflight`: unfit machines abort with
+   `E2E PREFLIGHT ABORT` instead of a false red; no-op without a key (CI
+   stays green). Thresholds lenient (CPU 85% / TCP connect / 3000ms /
+   disk 5GB). Regression: `server/tests/preflight.test.ts` (8 tests);
+   manual proof: real run FIT EXIT 0 (cpu 49.7%, tcp 3/3, 233ms, disk
+   184GB), `PREFLIGHT_FORCE_FAIL=1` aborts EXIT 1 with the clear message.
+2. Fixture tails 90s → 150s on all three tracks (186.5s / 213.0s / 211.0s,
+   all under the 240s poll deadline), regenerated via the documented
+   `build-*.py` scripts; numbers updated in `docs/test-plan.md`. Per-line
+   audio untouched.
+3. Retries deliberately NOT added (retry-green indistinguishable from pass;
+   doubles 4–9min runs) — logged in `docs/decisions.md`.
+4. Docs correction: stale `~49s` forklift duration in STATE.md replaced with
+   measured values.
+
+Post-fix runs (all reported): run 1 5/5 green 4m04s (forklift 57/57);
+run 2 4/5 6m30s (equipment 8-turn skip/reorder, forklift green);
+run 3 2/5 9m01s (degraded window, replay cliff); run 4 (150s tails) 4/5
+6m50s (forklift 57/57 green 3rd time, warehouse green, equipment 6-turn
+line-02-skip stall). Full-green 1/4, legs 15/20 (75%). Deterministic gates
+green every run (server 141/141 = 133 + 8 new, web 34/34, audit 0).
+Decision: tag NO-GO, Path B — `docs/release-decision.md` (flip condition:
+green `submission-check` Sept 29). Tripwire firing, classified
+environmental, not a regression.

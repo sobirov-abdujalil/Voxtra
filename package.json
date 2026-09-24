@@ -16,6 +16,7 @@
     "test": "npm run test --workspace=server",
     "smoke:live": "npm run smoke:live --workspace=server",
     "e2e": "playwright test -c e2e/playwright.config.ts",
+    "preflight": "npx tsx e2e/preflight.ts",
     "predemo": "npm test --workspace=server && npm run smoke:live --workspace=server && npm run e2e",
     "scan:leak": "node scripts/leak-scan.mjs",
     "submission-check": "npm run build --workspaces && npm run typecheck --workspaces && npm run lint --workspaces && npm test --workspace=server && npm test --workspace=web && npm audit --audit-level=high && npm run scan:leak && npm run predemo",

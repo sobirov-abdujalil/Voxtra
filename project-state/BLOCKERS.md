@@ -1,5 +1,17 @@
 # BLOCKERS.md — items needing the user
 
+Open gates 2026-09-24 (Task 14 release decision — `docs/release-decision.md`):
+1. **Deploy gate (OPEN)** — no public URL exists (no remote/CLI/account on
+   this machine). Manual first-deploy steps in `docs/deployment.md`; on
+   go-live: `curl /healthz` + `BASE_URL=<url> npm run e2e` twice, then fill
+   the URL into README + deployment + demo-script + demo-recording +
+   submission-checklist + submit-now. Until then Path B (localhost video).
+2. **Residual live-E2E nondeterminism (classified environmental, mitigated)** —
+   15/20 legs (75%) this task; every heard utterance maps correctly, failures
+   are turn-skip/reorder/replay under load. Mitigations: `npm run preflight`
+   abort gate + 150s fixture tails. No user action except: keep Sept 29
+   re-run on a calm machine; tag flips to go only on green.
+
 None blocking the foundation or the after-action report. Upcoming items that genuinely need the user:
 1. **AssemblyAI live verification** — CLOSED 2026-09-20: real `POST /api/voice/token` mints
    against `GET /v1/token`, real WS reaches `session.ready`, and the full 4-turn drill runs
