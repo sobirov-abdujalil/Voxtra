@@ -33,6 +33,16 @@ verified but no public URL exists and the deployed E2E has not run — claiming 
 credit now would inflate. On go-live with `BASE_URL=<url> npm run e2e` green
 (Warehouse 58/58 + Forklift 57/57 + Equipment 65/65), credit M5 partial per `docs/roadmap.md` and recompute here.)
 
+## Status: TASK 15 DEMO-RECORDING PREP 2026-09-24 — runbook ready, video awaits user's voice
+
+- Machine FIT: `npm run preflight` → `cpu=8.4% tcp=3/3 latency=355ms disk=188.0GB => FIT` (calm window, unlike Task 14's 44–57% degraded runs).
+- Warm-up `npm run predemo` → EXIT 0, GREEN 5/5, E2E leg 4.2m (forklift 57/57 golden incl. STT variants "11 right now", "Photographing the scene and keeping everyone clear" mapped correctly; warehouse 58/58; equipment + invalid-paths green). First full-green since Task 14 run 1 — consistent with the environmental classification (calm machine = green).
+- Capture test: 10s `ffmpeg gdigrab + dshow` clip → 1920x1080 h264 10.000000s + AAC stereo; mic floor −80.8 dB in a silent room (device live, room quiet); clip deleted. Decision recorded in `docs/demo-recording.md` §2: NO dshow loopback device exists on this box, so ffmpeg captures mic only — the real take MUST use Game Bar (present, mixed track) or OBS (needs user install).
+- App standing on http://localhost:3001/ (`GET /healthz` → 200 `{"status":"ok","commit":"unknown"}`); left running for the recording session.
+- New `docs/recording-runbook.md`: one-sheet, self-contained, beat-by-beat with exact lines / actions / expected reactions / per-beat fallback, title+outro cards (outro = "Repository: <pending>", no tunnel URL), Game Bar start/stop, best-of-three keep rule, post-recording ffprobe/volumedetect checks, A/B/C + never-fake honesty rules.
+- Video NOT yet recorded — requires the user's voice; no agent can supply it. Placeholders intact (`<!-- VIDEO_URL -->` in submit-now/submission-checklist). M5 deployment (14) + M6 (15) unclaimed; PROJECT COMPLETION stays 74%.
+- Gates: build/typecheck/lint 0; server 141/141; web 34/34; audit 0.
+
 ## Status: TASK 14 FORKLIFT DIAGNOSIS 2026-09-24 — NOT a product regression; tag NO-GO, Path B
 
 - Safety net first: commit 8c37bb7 (Tasks 2–13 tree, no tag, no push, no

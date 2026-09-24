@@ -286,3 +286,21 @@ green every run (server 141/141 = 133 + 8 new, web 34/34, audit 0).
 Decision: tag NO-GO, Path B — `docs/release-decision.md` (flip condition:
 green `submission-check` Sept 29). Tripwire firing, classified
 environmental, not a regression.
+
+## 2026-09-24 Task 15 recording-prep warm-up — GREEN 5/5 on a calm machine (supports the environmental classification)
+
+Warm-up `npm run predemo` (EXIT 0, E2E leg 4.2m) on the unchanged Task 14
+tree, minutes after a FIT preflight (cpu 8.4%, tcp 3/3 at 355ms): all 5 legs
+green — warehouse golden 58/58, forklift golden 57/57 (STT variants "11 right
+now" → call_emergency and "Photographing the scene and keeping everyone
+clear" → preserve_scene mapped correctly), equipment + both invalid-paths.
+First full-green since Task 14 run 1 (4m04s, also a calm window); every
+Task 13/14 red ran under 44–57% CPU with 6m30s–9m51s wall-clock inflation.
+Calm = green, loaded = skip/reorder/stall: the residual is load-correlated,
+not product logic. No code changed. Recording may proceed on FIT readings
+only — an UNFIT preflight means re-take later, not a product failure.
+
+Capture-path finding (same session, not a regression): no dshow loopback
+device exists on this machine, so the documented ffmpeg fallback captures mic
+only. Decision: Game Bar (mixed track) or OBS (separate tracks) for the real
+take; ffmpeg is rehearsal tooling. Recorded in `docs/demo-recording.md` §2.

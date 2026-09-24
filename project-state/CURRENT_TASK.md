@@ -109,3 +109,11 @@
   machine (tag flips to go only on green → v1.0.0 + RELEASE.md + commit);
   record the localhost demo video per `docs/demo-recording.md` (preflight
   FIT first, best of three takes). Deploy gate still needs the user (BLOCKERS.md).
+- [x] Recording-session prep (2026-09-24, Task 15 — runbook ready, video
+  OPEN): preflight FIT (8.4% CPU) + warm-up predemo GREEN 5/5 (4.2m E2E leg);
+  10s capture clip verified then deleted (no loopback device → Game Bar/OBS
+  decision in demo-recording.md §2); app standing on http://localhost:3001/
+  (/healthz 200); new self-contained `docs/recording-runbook.md`; STATE /
+  BLOCKERS / REGRESSIONS updated; gates green (141/141, 34/34, audit 0).
+  The take itself needs the user's voice — video URL placeholders intact,
+  M5 (14) + M6 (15) unclaimed, 74% unchanged.

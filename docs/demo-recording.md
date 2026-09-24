@@ -72,6 +72,14 @@ ffmpeg -f gdigrab -framerate 30 -i desktop `
 System-audio loopback under `dshow` is device-dependent; if the agent's voice
 is missing from the capture, record speaker output via OBS/Game Bar instead.
 
+Decision 2026-09-24 (Task 15 capture test): `ffmpeg -list_devices` on this
+machine enumerates NO loopback device (no Stereo Mix / virtual cable — only
+the two Realtek mics), so the `ffmpeg` command above captures mic only, never
+the agent's voice. The real take MUST use Game Bar (mixed track, present) or
+OBS (separate tracks, needs user install) — ffmpeg is screen+mic rehearsal
+tooling only. 10s screen+mic clip verified today (1920x1080, 10.000000s,
+mic floor −80.8 dB in a silent room = device live, room quiet; clip deleted).
+
 ## 3. Timed shooting script (shot list, total 180s)
 
 The five Warehouse voice lines and the Equipment line below are byte-identical
