@@ -20,6 +20,8 @@ test-results/
 logs/
 *.log
 *.tmp
+*.mp4
+release/verification-*.txt
 .DS_Store
 Thumbs.db
 

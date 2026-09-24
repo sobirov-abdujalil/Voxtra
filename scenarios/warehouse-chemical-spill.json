@@ -2,8 +2,8 @@
   "metadata": {
     "id": "warehouse-chemical-spill",
     "title": "Warehouse Chemical Spill",
-    "version": "0.1.0",
-    "description": "Respond to an unidentified chemical spill in a warehouse. Isolate, notify, identify, then clean up safely.",
+    "version": "0.2.0",
+    "description": "Respond to an unidentified chemical spill in a warehouse. Isolate, notify, identify, document, then clean up safely.",
     "initialState": "unidentified_spill"
   },
   "states": [
@@ -11,6 +11,7 @@
     { "id": "area_isolated", "label": "Area isolated", "terminal": false },
     { "id": "coordinated", "label": "Isolated and supervisor notified", "terminal": false },
     { "id": "ready_for_cleanup", "label": "Ready for safe cleanup", "terminal": false },
+    { "id": "documented", "label": "Incident documented", "terminal": false },
     { "id": "resolved", "label": "Spill safely resolved", "terminal": true },
     { "id": "exposed", "label": "Exposed to chemical (recoverable)", "terminal": false },
     { "id": "abandoned", "label": "Scene left unattended (recoverable)", "terminal": false }
@@ -19,12 +20,13 @@
     "isolate_area",
     "notify_supervisor",
     "inspect_label",
+    "document_incident",
     "ask_for_help",
     "approach_spill",
     "clean_spill",
     "leave_area"
   ],
-  "criticalActions": ["clean_spill", "approach_spill", "leave_area"],
+  "criticalActions": ["isolate_area", "notify_supervisor", "inspect_label", "document_incident", "clean_spill"],
   "transitions": [
     { "from": "unidentified_spill", "intent": "isolate_area", "to": "area_isolated", "scoreDelta": 10, "consequence": "You cordon off the area. Nobody else can wander into the spill.", "setFlags": ["isolated"] },
     { "from": "unidentified_spill", "intent": "notify_supervisor", "to": "unidentified_spill", "scoreDelta": 5, "consequence": "Supervisor alerted, but the area is still open. Isolate the area now.", "setFlags": ["notified"] },
@@ -50,11 +52,22 @@
     { "from": "coordinated", "intent": "clean_spill", "to": "exposed", "scoreDelta": -10, "consequence": "Cleaning before identifying the chemical causes exposure. Inspect the label first.", "setFlags": ["exposed"] },
     { "from": "coordinated", "intent": "leave_area", "to": "abandoned", "scoreDelta": -8, "consequence": "You walk away from a coordinated response. Return to the scene.", "setFlags": ["abandoned"] },
 
-    { "from": "ready_for_cleanup", "intent": "clean_spill", "to": "resolved", "scoreDelta": 20, "consequence": "Following the identified procedure with protection, you neutralize and clean the spill. Scene safe.", "setFlags": ["cleaned"] },
-    { "from": "ready_for_cleanup", "intent": "approach_spill", "to": "ready_for_cleanup", "scoreDelta": 0, "consequence": "You approach with precautions and confirm the plan. Clean up when ready." },
-    { "from": "ready_for_cleanup", "intent": "ask_for_help", "to": "ready_for_cleanup", "scoreDelta": 2, "consequence": "Helpers stand by with equipment. Proceed with cleanup." },
-    { "from": "ready_for_cleanup", "intent": "isolate_area", "to": "ready_for_cleanup", "scoreDelta": 0, "consequence": "Cordon holds. Proceed with the identified cleanup." },
+    { "from": "ready_for_cleanup", "intent": "document_incident", "to": "documented", "scoreDelta": 10, "consequence": "You log the incident: time, chemical, and actions taken. Supervisor signs off. Now complete the cleanup.", "setFlags": ["documented"] },
+    { "from": "ready_for_cleanup", "intent": "clean_spill", "to": "resolved", "scoreDelta": 20, "consequence": "Following the identified procedure with protection, you neutralize and clean the spill. Scene safe. Document the incident to close out.", "setFlags": ["cleaned"] },
+    { "from": "ready_for_cleanup", "intent": "approach_spill", "to": "ready_for_cleanup", "scoreDelta": 0, "consequence": "You approach with precautions and confirm the plan. Document the incident, then clean up." },
+    { "from": "ready_for_cleanup", "intent": "ask_for_help", "to": "ready_for_cleanup", "scoreDelta": 2, "consequence": "Helpers stand by with equipment. Document the incident, then proceed with cleanup." },
+    { "from": "ready_for_cleanup", "intent": "isolate_area", "to": "ready_for_cleanup", "scoreDelta": 0, "consequence": "Cordon holds. Document the incident, then proceed with the identified cleanup." },
     { "from": "ready_for_cleanup", "intent": "leave_area", "to": "abandoned", "scoreDelta": -8, "consequence": "You leave just before finishing. Return and complete the cleanup.", "setFlags": ["abandoned"] },
+
+    { "from": "documented", "intent": "clean_spill", "to": "resolved", "scoreDelta": 20, "consequence": "Following the identified procedure with protection, you neutralize and clean the spill. Scene safe and documented.", "setFlags": ["cleaned"] },
+    { "from": "documented", "intent": "ask_for_help", "to": "documented", "scoreDelta": 2, "consequence": "Helpers confirm the log. Proceed with cleanup." },
+    { "from": "documented", "intent": "isolate_area", "to": "documented", "scoreDelta": 0, "consequence": "Cordon holds. Proceed with the identified cleanup." },
+    { "from": "documented", "intent": "notify_supervisor", "to": "documented", "scoreDelta": 0, "consequence": "Supervisor already briefed and signed the log. Proceed with cleanup." },
+    { "from": "documented", "intent": "inspect_label", "to": "documented", "scoreDelta": 0, "consequence": "Chemical already identified and logged. Proceed with cleanup." },
+    { "from": "documented", "intent": "approach_spill", "to": "documented", "scoreDelta": 0, "consequence": "You approach with precautions and confirm the plan. Clean up when ready." },
+    { "from": "documented", "intent": "leave_area", "to": "abandoned", "scoreDelta": -8, "consequence": "You leave just before finishing. Return and complete the cleanup.", "setFlags": ["abandoned"] },
+
+    { "from": "resolved", "intent": "document_incident", "to": "resolved", "scoreDelta": 10, "consequence": "You log the incident after cleanup. The record is complete.", "setFlags": ["documented"] },
 
     { "from": "exposed", "intent": "isolate_area", "to": "area_isolated", "scoreDelta": 5, "consequence": "You retreat, decontaminate roughly, and cordon the area. Now notify your supervisor." },
     { "from": "exposed", "intent": "ask_for_help", "to": "exposed", "scoreDelta": 3, "consequence": "Help arrives and pulls you clear. Isolate the area and get checked." },
@@ -70,11 +83,11 @@
   ],
   "completionCriteria": {
     "state": "resolved",
-    "requiredFlags": ["isolated", "notified", "inspected", "cleaned"]
+    "requiredFlags": ["isolated", "notified", "inspected", "documented", "cleaned"]
   },
   "scoringRules": {
     "startScore": 0,
-    "notes": "Deterministic sum of transition scoreDeltas. Golden path (isolate 10 + notify 10 + inspect 8 + clean 20, with isolated-state inspect 8) demonstrates safe sequencing. Unsafe shortcuts carry negative deltas."
+    "notes": "Deterministic sum of transition scoreDeltas. Golden path (isolate 10 + notify 10 + inspect 8 + document 10 + clean 20 = 58) demonstrates safe sequencing per the brief progression. Denominator 58 is the max over strict-progress paths (no self-loop stays); optional self-loop bonuses (early notify/inspect/ask) are extra credit beyond the denominator. Unsafe shortcuts carry negative deltas."
   },
   "evidenceRequirements": ["every turn appends { turn, intent, from, to, scoreDelta }", "report renders from log"],
   "recoveryPaths": {

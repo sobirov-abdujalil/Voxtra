@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { applyAction, buildReport, createInitialState, isCompleted } from '../src/scenario/engine.js';
+import {
+  applyAction,
+  buildReport,
+  computeDenominator,
+  computeMaxScore,
+  createInitialState,
+  isCompleted,
+} from '../src/scenario/engine.js';
 import { loadScenarios } from '../src/scenario/loader.js';
 
 function setup() {
@@ -10,13 +17,14 @@ function setup() {
 }
 
 describe('scenario engine: valid golden path', () => {
-  it('isolate -> notify -> inspect -> clean completes with deterministic score', () => {
+  it('isolate -> notify -> inspect -> document -> clean completes with deterministic score', () => {
     const { def, initial } = setup();
     let s = initial;
     const steps: Array<[string, number, string]> = [
       ['isolate_area', 10, 'area_isolated'],
       ['notify_supervisor', 10, 'coordinated'],
       ['inspect_label', 8, 'ready_for_cleanup'],
+      ['document_incident', 10, 'documented'],
       ['clean_spill', 20, 'resolved'],
     ];
     for (const [intent, delta, to] of steps) {
@@ -27,9 +35,26 @@ describe('scenario engine: valid golden path', () => {
       s = r.state;
     }
     expect(s.completed).toBe(true);
-    expect(s.score).toBe(48);
-    expect(s.evidence).toHaveLength(4);
+    expect(s.score).toBe(58);
+    expect(s.evidence).toHaveLength(5);
     expect(isCompleted(s, def.completionCriteria)).toBe(true);
+  });
+
+  it('clean before document reaches resolved but stays incomplete until documented', () => {
+    const { def, initial } = setup();
+    let s = initial;
+    for (const intent of ['isolate_area', 'notify_supervisor', 'inspect_label', 'clean_spill']) {
+      s = applyAction(def, s, intent).state;
+    }
+    expect(s.current).toBe('resolved');
+    expect(s.completed).toBe(false);
+    expect(s.score).toBe(48);
+    const r = applyAction(def, s, 'document_incident');
+    expect(r.ok).toBe(true);
+    expect(r.scoreDelta).toBe(10);
+    expect(r.state.current).toBe('resolved');
+    expect(r.state.completed).toBe(true);
+    expect(r.state.score).toBe(58);
   });
 });
 
@@ -102,6 +127,48 @@ describe('scenario engine: scoring and evidence', () => {
     expect(report.score).toBe(r.state.score);
     expect(report.evidence).toEqual(r.state.evidence);
     expect(report.completed).toBe(false);
+    expect(report.denominator).toBe(58);
+    expect(report.breakdown.completed).toHaveLength(1);
+    expect(report.breakdown.missed.map((m) => m.action)).toContain('document_incident');
+  });
+
+  it('denominator is the strict-progress max and golden achieves it', () => {
+    const { def } = setup();
+    expect(computeDenominator(def)).toBe(58);
+    expect(computeMaxScore(def)).toBeGreaterThan(58);
+  });
+
+  it('document_incident transitions ready_for_cleanup to documented with +10', () => {
+    const { def, initial } = setup();
+    let s = initial;
+    for (const intent of ['isolate_area', 'notify_supervisor', 'inspect_label']) {
+      s = applyAction(def, s, intent).state;
+    }
+    expect(s.current).toBe('ready_for_cleanup');
+    const r = applyAction(def, s, 'document_incident');
+    expect(r.ok).toBe(true);
+    expect(r.state.current).toBe('documented');
+    expect(r.scoreDelta).toBe(10);
+    expect(r.state.evidence[r.state.evidence.length - 1]).toMatchObject({
+      intent: 'document_incident',
+      from: 'ready_for_cleanup',
+      to: 'documented',
+      scoreDelta: 10,
+    });
+  });
+
+  it('report breakdown tracks invalid, penalty, and recovery turns', () => {
+    const { def, initial } = setup();
+    let s = applyAction(def, initial, 'clean_spill').state;
+    expect(s.current).toBe('exposed');
+    s = applyAction(def, s, 'isolate_area').state;
+    const rejected = applyAction(def, s, 'teleport');
+    s = rejected.state;
+    const report = buildReport(s, def);
+    expect(report.breakdown.penalties.length).toBeGreaterThan(0);
+    expect(report.breakdown.penalties[0]).toMatchObject({ turn: 1, intent: 'clean_spill' });
+    expect(report.breakdown.recovery.map((r) => r.turn)).toContain(2);
+    expect(report.breakdown.invalid.map((r) => r.turn)).toContain(3);
   });
 });
 

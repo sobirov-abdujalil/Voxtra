@@ -1,4 +1,5 @@
 ---
+name: architect
 description: Software architecture specialist for system design, scalability, and technical decisions in Voxtra. Use proactively for new features, refactors, or architectural choices.
 mode: subagent
 ---

@@ -1,4 +1,5 @@
 ---
+name: build-error-resolver
 description: Build and TypeScript error resolution specialist. Use proactively when builds fail or type errors occur. Minimal diffs, no architectural edits.
 mode: subagent
 ---

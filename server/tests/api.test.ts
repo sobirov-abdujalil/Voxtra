@@ -69,7 +69,53 @@ describe('API: session turn loop', () => {
     const report = await request(app).get(`/api/sessions/${sessionId}/report`);
     expect(report.status).toBe(200);
     expect(report.body.data.score).toBe(10);
+    expect(report.body.data.denominator).toBe(58);
     expect(report.body.data.evidence).toHaveLength(1);
+    expect(report.body.data.breakdown.completed[0]).toMatchObject({ action: 'isolate_area', turn: 1 });
+  });
+
+  it('report for a completed drill carries denominator, summary, and full breakdown', async () => {
+    const app = createApp(baseConfig);
+    const created = await request(app).post('/api/sessions').send({ scenarioId: 'warehouse-chemical-spill' });
+    const sessionId = created.body.data.sessionId as string;
+    for (const intent of ['isolate_area', 'notify_supervisor', 'inspect_label', 'document_incident', 'clean_spill']) {
+      const turn = await request(app).post(`/api/sessions/${sessionId}/turn`).send({ intent });
+      expect(turn.status).toBe(200);
+    }
+    const report = await request(app).get(`/api/sessions/${sessionId}/report`);
+    expect(report.status).toBe(200);
+    expect(report.body.data.completed).toBe(true);
+    expect(report.body.data.score).toBe(58);
+    expect(report.body.data.denominator).toBe(58);
+    expect(report.body.data.summary).toContain('58/58');
+    expect(report.body.data.breakdown.completed).toHaveLength(5);
+    expect(report.body.data.breakdown.missed).toHaveLength(0);
+    expect(report.body.data.evidence).toHaveLength(5);
+  });
+
+  it('report tracks an invalid action turn', async () => {
+    const app = createApp(baseConfig);
+    const created = await request(app).post('/api/sessions').send({ scenarioId: 'warehouse-chemical-spill' });
+    const sessionId = created.body.data.sessionId as string;
+    await request(app).post(`/api/sessions/${sessionId}/turn`).send({ intent: 'isolate_area' });
+    const bad = await request(app).post(`/api/sessions/${sessionId}/turn`).send({ intent: 'teleport' });
+    expect(bad.status).toBe(400);
+    const report = await request(app).get(`/api/sessions/${sessionId}/report`);
+    expect(report.body.data.breakdown.invalid).toHaveLength(1);
+    expect(report.body.data.breakdown.invalid[0].turn).toBe(2);
+  });
+
+  it('report tracks a penalty and a recovery turn', async () => {
+    const app = createApp(baseConfig);
+    const created = await request(app).post('/api/sessions').send({ scenarioId: 'warehouse-chemical-spill' });
+    const sessionId = created.body.data.sessionId as string;
+    await request(app)
+      .post(`/api/sessions/${sessionId}/turn`)
+      .send({ intent: 'clean_spill', userTranscript: 'I will clean it up' });
+    await request(app).post(`/api/sessions/${sessionId}/turn`).send({ intent: 'isolate_area' });
+    const report = await request(app).get(`/api/sessions/${sessionId}/report`);
+    expect(report.body.data.breakdown.penalties[0]).toMatchObject({ turn: 1, intent: 'clean_spill' });
+    expect(report.body.data.breakdown.recovery.map((r: { turn: number }) => r.turn)).toContain(2);
   });
 });
 

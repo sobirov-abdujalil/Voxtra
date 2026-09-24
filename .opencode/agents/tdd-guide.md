@@ -1,4 +1,5 @@
 ---
+name: tdd-guide
 description: Test-Driven Development specialist enforcing write-tests-first methodology with 80%+ coverage. Use proactively for features, bug fixes, and refactors.
 mode: subagent
 ---

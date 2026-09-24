@@ -1,0 +1,24 @@
+# VoxDrill on Render — single web service, same-origin API + web bundle.
+# Git-based deploys: push to the connected branch to redeploy.
+# Secrets are set in the Render dashboard (never in this file, never in git).
+services:
+  - type: web
+    name: voxdrill
+    runtime: node
+    plan: free
+    buildCommand: npm install && npm run build --workspaces
+    startCommand: npm run start --workspace=server
+    healthCheckPath: /healthz
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: 24.19.0
+      # Set in dashboard as a secret (do NOT add a value here):
+      # - key: ASSEMBLYAI_API_KEY
+      #   sync: false
+      # Optional overrides (dashboard):
+      # - key: CORS_ORIGIN
+      #   value: https://<your-service>.onrender.com
+      # - key: GIT_COMMIT
+      #   value: <set by CI or dashboard>

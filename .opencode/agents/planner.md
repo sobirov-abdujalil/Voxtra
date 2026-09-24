@@ -1,4 +1,5 @@
 ---
+name: planner
 description: Expert planning specialist for complex features and refactoring. Use proactively when implementing features, architectural changes, or complex refactoring in Voxtra.
 mode: subagent
 ---

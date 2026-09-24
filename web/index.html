@@ -3,34 +3,253 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Voxtra — VoxDrill</title>
+    <title>VoxDrill — Voice drills with evidence-based reports</title>
+    <style>
+      :root {
+        color-scheme: light;
+        /* Type scale */
+        --font-xs: 0.8rem;
+        --font-sm: 0.875rem;
+        --font-base: 1rem;
+        --font-lg: 1.25rem;
+        --font-xl: 1.6rem;
+        --font-score: 3rem;
+        /* Spacing scale (4px base) */
+        --space-1: 4px;
+        --space-2: 8px;
+        --space-3: 12px;
+        --space-4: 16px;
+        --space-5: 24px;
+        --space-6: 32px;
+        /* Color */
+        --bg: #fafafa;
+        --surface: #fff;
+        --surface-muted: #fcfcfc;
+        --border: #e3e3e3;
+        --text: #1a1a1a;
+        --muted: #555;
+        --primary: #0b5fff;
+        --primary-dark: #0849c4;
+        --success: #0a7a2f;
+        --success-bg: #f2fbf5;
+        --danger: #c0392b;
+        --danger-bg: #fff7f6;
+        --chip-bg: #eef3ff;
+        --chip-border: #c9d8ff;
+        --radius: 10px;
+        --radius-sm: 8px;
+      }
+      * { box-sizing: border-box; }
+      body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin: 0; color: var(--text); background: var(--bg); font-size: var(--font-base); line-height: 1.5; }
+      #app { max-width: 960px; margin: 0 auto; padding: var(--space-5) var(--space-4) 64px; }
+      h1 { font-size: var(--font-xl); margin: 0 0 var(--space-2); letter-spacing: -0.01em; }
+      h2 { font-size: var(--font-lg); margin: 0 0 var(--space-2); }
+      h3 { font-size: var(--font-base); margin: var(--space-4) 0 var(--space-2); }
+      p { margin: 0 0 var(--space-2); }
+      .tagline { font-size: var(--font-lg); color: var(--muted); margin: 0 0 var(--space-4); }
+      section, .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--space-4); margin: var(--space-3) 0; }
+      button { cursor: pointer; border: 1px solid #ccc; background: #f4f4f4; border-radius: var(--radius-sm); padding: var(--space-2) var(--space-3); font-size: 0.9rem; color: var(--text); }
+      button:disabled { opacity: 0.5; cursor: default; }
+      button.primary { background: var(--primary); border-color: var(--primary); color: #fff; font-weight: 600; }
+      button.primary:hover:not(:disabled) { background: var(--primary-dark); }
+      :focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; border-radius: 4px; }
+      #status { min-height: 1.5em; }
+      .muted { color: var(--muted); font-size: var(--font-sm); }
+
+      /* Top nav */
+      nav.topnav { display: flex; gap: var(--space-2); margin: var(--space-3) 0; flex-wrap: wrap; }
+
+      /* Selection screen */
+      #scenario-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--space-3); margin: var(--space-4) 0; }
+      .scenario-card { display: flex; flex-direction: column; gap: var(--space-2); }
+      .scenario-card h3 { margin: 0; }
+      .scenario-card p { color: var(--muted); font-size: var(--font-sm); flex: 1; }
+      .scenario-card.active { border: 2px solid var(--primary); }
+      .scenario-card.disabled { opacity: 0.75; background: var(--surface-muted); }
+      .coming-soon { display: inline-block; align-self: flex-start; background: #f0f0f0; border: 1px solid var(--border); border-radius: 999px; padding: 2px 10px; font-size: var(--font-xs); font-weight: 600; color: var(--muted); }
+      #how-it-works { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: var(--space-2); list-style: none; padding: 0; margin: var(--space-2) 0 0; counter-reset: steps; }
+      #how-it-works li { border: 1px solid var(--border); border-radius: var(--radius-sm); padding: var(--space-3); background: var(--surface-muted); font-size: var(--font-sm); }
+      #how-it-works li strong { display: block; font-size: var(--font-sm); margin-bottom: var(--space-1); }
+      #mic-guidance { font-size: var(--font-sm); color: var(--muted); }
+
+      /* Drill view */
+      .drill-grid { display: grid; grid-template-columns: 1fr; gap: 0; }
+      @media (min-width: 900px) {
+        .drill-grid.two-col { grid-template-columns: 1.15fr 1fr; gap: var(--space-3); align-items: start; }
+        .drill-grid.two-col > section { margin: 0 0 var(--space-3); }
+      }
+      .state-hero { border-left: 4px solid var(--primary); }
+      #scenario-label { font-size: var(--font-lg); font-weight: 700; margin: 0 0 var(--space-1); }
+      #progress-indicator { color: var(--muted); font-size: var(--font-sm); margin: 0; }
+      #consequence { font-size: var(--font-base); }
+      #mic-indicator { display: flex; align-items: center; gap: var(--space-2); }
+      #mic-dot { width: 12px; height: 12px; border-radius: 50%; background: #bbb; flex: none; }
+      #mic-indicator[data-mic-state="live"] #mic-dot { background: var(--success); }
+      #mic-indicator[data-mic-state="requesting"] #mic-dot { background: var(--primary); }
+      #mic-indicator[data-mic-state="denied"] #mic-dot,
+      #mic-indicator[data-mic-state="error"] #mic-dot { background: var(--danger); }
+      #mic-indicator[data-mic-state="stopped"] #mic-dot { background: #888; }
+      #mic-state { font-variant-numeric: tabular-nums; }
+      #mic-label { font-weight: 600; }
+      #barge-cue { font-size: var(--font-sm); color: var(--muted); background: var(--success-bg); border: 1px solid #cfe8d6; border-radius: 999px; padding: 2px 10px; display: inline-block; margin-top: var(--space-2); }
+      #transcript-partial { font-style: italic; color: var(--muted); border-left: 3px solid var(--chip-border); padding-left: var(--space-2); min-height: 1.5em; }
+      #transcript-final-wrap { max-height: 220px; overflow-y: auto; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: var(--space-2) var(--space-3); background: var(--surface-muted); }
+      #transcript-final { margin: 0; padding-left: 1.25rem; }
+      #transcript-final li { margin: var(--space-1) 0; }
+      #state { white-space: pre-wrap; word-break: break-word; font-size: var(--font-xs); color: var(--muted); max-height: 180px; overflow-y: auto; background: var(--surface-muted); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: var(--space-2); }
+      #drill-timeline-list { list-style: none; margin: 0; padding: 0; }
+      .drill-timeline-row { display: flex; gap: var(--space-2); flex-wrap: wrap; align-items: center; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: var(--space-2) var(--space-3); margin: var(--space-2) 0; background: var(--surface); font-size: var(--font-sm); }
+      .drill-timeline-row.positive { border-left: 4px solid var(--success); }
+      .drill-timeline-row.negative { border-left: 4px solid var(--danger); background: var(--danger-bg); }
+      .drill-timeline-row.neutral { border-left: 4px solid #bbb; }
+      .drill-timeline-empty { color: var(--muted); font-size: var(--font-sm); list-style: none; }
+      .turn-num { font-weight: 700; }
+      .intent-chip { background: var(--chip-bg); border: 1px solid var(--chip-border); border-radius: 999px; padding: 2px 8px; font-size: var(--font-xs); }
+      .state-change, .score-delta { font-size: var(--font-sm); color: #444; }
+      .score-delta { font-weight: 700; font-variant-numeric: tabular-nums; }
+      .drill-timeline-row.positive .score-delta { color: var(--success); }
+      .drill-timeline-row.negative .score-delta { color: var(--danger); }
+      #report-cta-container { margin-top: var(--space-3); border: 2px solid var(--success); border-radius: var(--radius); padding: var(--space-4); background: var(--success-bg); text-align: center; }
+      #report-cta-container p { margin: 0 0 var(--space-2); font-weight: 600; }
+      #open-report { font-size: 1rem; padding: 10px 16px; }
+      #drill-error { border: 2px solid var(--danger); background: var(--danger-bg); border-radius: var(--radius); padding: var(--space-3) var(--space-4); margin: var(--space-3) 0; }
+      #drill-error-message { font-weight: 600; margin: 0 0 var(--space-2); }
+      #intents { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+
+      /* Report (Task 4 information architecture unchanged; continuity polish only) */
+      .report-header { text-align: left; border-bottom: 2px solid #eee; padding-bottom: var(--space-3); margin-bottom: var(--space-3); }
+      #report-score { font-size: var(--font-score); margin: 0; letter-spacing: -0.02em; }
+      #report-completion.completed { color: var(--success); font-weight: 700; }
+      #report-completion.incomplete { color: var(--danger); font-weight: 700; }
+      #report-summary { font-size: 1rem; color: #333; }
+      #report-breakdown { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: var(--space-3); }
+      .breakdown-group { border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px; background: var(--surface-muted); }
+      .breakdown-group h4 { margin: 0 0 var(--space-2); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); }
+      .breakdown-entry { display: block; width: 100%; text-align: left; margin: 4px 0; }
+      .breakdown-entry.missed { background: transparent; border: none; cursor: default; padding: 4px 0; }
+      #report-timeline { margin-top: var(--space-4); }
+      .timeline-row { border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px; margin: var(--space-2) 0; background: var(--surface); cursor: pointer; }
+      .timeline-row.positive { border-left: 4px solid var(--success); }
+      .timeline-row.negative { border-left: 4px solid var(--danger); background: var(--danger-bg); }
+      .timeline-row.highlighted { outline: 3px solid var(--primary); }
+      .timeline-header { display: flex; gap: var(--space-2); flex-wrap: wrap; align-items: center; }
+      .transcript-line { margin: var(--space-2) 0 0; color: #222; }
+      .timeline-detail { margin-top: var(--space-2); border-top: 1px dashed #ddd; padding-top: var(--space-2); }
+      #report-error { color: var(--danger); font-weight: 600; }
+
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+      }
+    </style>
   </head>
   <body>
     <main id="app">
-      <h1>VoxDrill: Warehouse Chemical Spill</h1>
-      <p id="status" role="status">Initializing…</p>
-      <section>
-        <button id="start-session" type="button">Start drill session</button>
-        <button id="start-voice" type="button" disabled>Start voice</button>
-        <button id="stop-voice" type="button" disabled>Stop voice</button>
-      </section>
-      <section>
-        <h2>Current state</h2>
-        <pre id="state">No session yet.</pre>
-      </section>
-      <section>
-        <h2>Send intent (text fallback / debug)</h2>
-        <div id="intents"></div>
-      </section>
-      <section>
-        <h2>Consequence</h2>
-        <p id="consequence">—</p>
-      </section>
-      <section>
-        <h2>After-action report</h2>
-        <button id="load-report" type="button" disabled>Load report</button>
-        <pre id="report">—</pre>
-      </section>
+      <nav class="topnav" aria-label="Primary">
+        <button id="nav-home" type="button">Scenarios</button>
+        <button id="nav-drill" type="button">Drill</button>
+        <button id="nav-report" type="button" disabled>Report</button>
+      </nav>
+
+      <div id="selection-view" hidden>
+        <h1>VoxDrill</h1>
+        <p id="product-tagline" class="tagline">Speak your decisions. The scenario reacts. Get an evidence-based after-action report.</p>
+        <section aria-labelledby="scenario-heading">
+          <h2 id="scenario-heading">Choose a scenario</h2>
+          <div id="scenario-cards">
+            <article class="card scenario-card active" data-scenario="warehouse-chemical-spill" aria-labelledby="card-warehouse-title">
+              <h3 id="card-warehouse-title">Warehouse Chemical Spill</h3>
+              <p>An unidentified spill on the warehouse floor. Isolate, notify, identify, document, then clean up safely — by voice.</p>
+              <button id="select-start-warehouse" type="button" class="primary">Start drill</button>
+            </article>
+            <article class="card scenario-card active" data-scenario="forklift-incident" aria-labelledby="card-forklift-title">
+              <h3 id="card-forklift-title">Forklift Incident</h3>
+              <p>A pedestrian struck by a forklift in a busy aisle. Secure the scene, summon medics without moving the victim, escalate, preserve, and file the report.</p>
+              <button id="select-forklift" type="button" class="primary">Start drill</button>
+            </article>
+            <article class="card scenario-card active" data-scenario="equipment-malfunction" aria-labelledby="card-equipment-title">
+              <h3 id="card-equipment-title">Equipment Malfunction</h3>
+              <p>A robotic arm has re-energized with a technician inside the cell. Halt the arm, lock it out, clear the area, verify the technician, and file the report.</p>
+              <button id="select-equipment" type="button" class="primary">Start drill</button>
+            </article>
+          </div>
+        </section>
+        <section aria-labelledby="how-heading">
+          <h2 id="how-heading">How it works</h2>
+          <ol id="how-it-works">
+            <li><strong>1. Speak</strong>Say what you would do, out loud, into your microphone.</li>
+            <li><strong>2. Scenario reacts</strong>The simulation applies your decision and answers with a consequence.</li>
+            <li><strong>3. Evidence recorded</strong>Every turn is logged with intent, state change, and score.</li>
+            <li><strong>4. After-action report</strong>Finish the drill to open your scored, evidence-backed report.</li>
+          </ol>
+        </section>
+        <p id="mic-guidance" class="muted">Microphone required. Chromium (Chrome or Edge) recommended — allow microphone permission when prompted. If voice fails, the text intent buttons work the same way.</p>
+      </div>
+
+      <div id="drill-view" hidden>
+        <h1>Warehouse Chemical Spill drill</h1>
+        <p id="status" role="status">Initializing…</p>
+        <div id="drill-error" role="alert" hidden>
+          <p id="drill-error-message"></p>
+          <button id="drill-error-dismiss" type="button">Use text intents instead</button>
+        </div>
+        <section aria-label="Drill controls">
+          <button id="start-session" type="button">Start drill session</button>
+          <button id="start-voice" type="button" disabled>Start drill (voice)</button>
+          <button id="stop-voice" type="button" disabled>Stop voice</button>
+        </section>
+        <div class="drill-grid two-col">
+          <div>
+            <section class="state-hero" aria-labelledby="state-heading">
+              <h2 id="state-heading">Current situation</h2>
+              <p id="scenario-label">No session yet.</p>
+              <p id="progress-indicator">0 of 5 required actions completed</p>
+            </section>
+            <section aria-labelledby="consequence-heading">
+              <h2 id="consequence-heading">Consequence</h2>
+              <p id="consequence">—</p>
+              <div id="report-cta-container" hidden>
+                <p>Drill complete — your evidence is ready.</p>
+                <button id="open-report" type="button" class="primary">View after-action report</button>
+              </div>
+            </section>
+            <section aria-labelledby="timeline-heading">
+              <h2 id="timeline-heading">Drill timeline</h2>
+              <ol id="drill-timeline-list"></ol>
+            </section>
+          </div>
+          <div>
+            <section aria-labelledby="voice-heading">
+              <h2 id="voice-heading">Voice</h2>
+              <p id="mic-indicator" data-mic-state="idle"><span id="mic-dot" aria-hidden="true"></span><span>Mic: <span id="mic-state">idle</span> — <span id="mic-label">Idle</span></span></p>
+              <p id="barge-cue" hidden>You can speak anytime — interrupting is fine.</p>
+            </section>
+            <section aria-labelledby="transcript-heading">
+              <h2 id="transcript-heading">Live transcript</h2>
+              <p id="transcript-partial" aria-live="polite">—</p>
+              <div id="transcript-final-wrap">
+                <ol id="transcript-final"></ol>
+              </div>
+            </section>
+            <section aria-labelledby="debug-heading">
+              <h2 id="debug-heading">Send intent (text fallback / debug)</h2>
+              <div id="intents"></div>
+            </section>
+            <section aria-labelledby="raw-heading">
+              <h2 id="raw-heading">Session detail</h2>
+              <pre id="state">No session yet.</pre>
+            </section>
+          </div>
+        </div>
+      </div>
+
+      <div id="report-view" hidden>
+        <section>
+          <h2>After-action report</h2>
+          <p id="report-meta">—</p>
+          <div id="report-content"></div>
+          <p><button id="back-to-drill" type="button">Back to drill</button></p>
+        </section>
+      </div>
     </main>
     <script type="module" src="/src/main.ts"></script>
   </body>

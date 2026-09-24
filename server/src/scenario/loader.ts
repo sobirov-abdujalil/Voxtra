@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { ScenarioDefinition } from './types.js';
@@ -13,19 +13,27 @@ function loadScenarioFile(absPath: string): ScenarioDefinition {
 export function loadScenarios(): Map<string, ScenarioDefinition> {
   // dist layout: dist/scenario/loader.js -> repo: scenarios/*.json (../../scenarios)
   // src layout (tests): server/src/scenario/loader.ts -> ../../scenarios
-  const candidates = [
-    join(here, '..', '..', 'scenarios', 'warehouse-chemical-spill.json'),
-    join(here, '..', '..', '..', 'scenarios', 'warehouse-chemical-spill.json'),
+  // Loads every scenarios/*.json by id (additive: Warehouse + Forklift, no hardcoded file).
+  const dirCandidates = [
+    join(here, '..', '..', 'scenarios'),
+    join(here, '..', '..', '..', 'scenarios'),
   ];
   const map = new Map<string, ScenarioDefinition>();
-  for (const p of candidates) {
+  for (const dir of dirCandidates) {
     try {
-      const def = loadScenarioFile(p);
-      map.set(def.metadata.id, def);
-      return map;
+      const files = readdirSync(dir).filter((f) => f.endsWith('.json')).sort();
+      for (const f of files) {
+        try {
+          const def = loadScenarioFile(join(dir, f));
+          if (def?.metadata?.id) map.set(def.metadata.id, def);
+        } catch {
+          // skip unreadable file, try next
+        }
+      }
+      if (map.size > 0) return map;
     } catch {
-      // try next candidate
+      // try next candidate dir
     }
   }
-  throw new Error('No scenario definitions found (looked for scenarios/warehouse-chemical-spill.json)');
+  throw new Error('No scenario definitions found (looked for scenarios/*.json)');
 }

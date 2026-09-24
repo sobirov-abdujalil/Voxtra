@@ -1,4 +1,5 @@
 ---
+name: security-reviewer
 description: Security vulnerability detection and remediation specialist. Use proactively for auth, user input, API endpoints, secrets, and third-party integrations.
 mode: subagent
 ---

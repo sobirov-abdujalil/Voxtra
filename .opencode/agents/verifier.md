@@ -1,4 +1,5 @@
 ---
+name: verifier
 description: Verification specialist that runs build, typecheck, lint, tests, and security gates before PRs. Use after features, refactors, or before commits.
 mode: subagent
 ---

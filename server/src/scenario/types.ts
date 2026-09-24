@@ -2,6 +2,7 @@ export const INTENTS = [
   'isolate_area',
   'notify_supervisor',
   'inspect_label',
+  'document_incident',
   'ask_for_help',
   'approach_spill',
   'clean_spill',
@@ -16,6 +17,14 @@ export interface EvidenceEntry {
   from: string;
   to: string;
   scoreDelta: number;
+  /** Deterministic rule id, e.g. "unidentified_spill::isolate_area". Set by the engine. */
+  rule?: string;
+  /** Deterministic outcome: 'applied' when ok, 'rejected' otherwise. Set by the engine. */
+  result?: 'applied' | 'rejected';
+  /** Sanitized user transcript for this turn. Set by the API layer (never inside the engine). */
+  userTranscript?: string;
+  /** Wall-clock ISO timestamp. Set by the API layer (never inside the engine). */
+  timestamp?: string;
 }
 
 export interface ScenarioState {
@@ -59,6 +68,10 @@ export interface ScenarioDefinition {
   scoringRules: { startScore: number; notes: string };
   evidenceRequirements: string[];
   recoveryPaths: Record<string, string[]>;
+  /** Optional explicit failure states. Defaults to ['exposed','abandoned'] (Warehouse) when absent. */
+  failureStates?: string[];
+  /** Optional recovery intents counted in breakdown.recovery even without a failure-state transition. */
+  recoveryIntents?: string[];
 }
 
 export interface EngineResult {

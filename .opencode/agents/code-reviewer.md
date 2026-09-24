@@ -1,4 +1,5 @@
 ---
+name: code-reviewer
 description: Expert code review specialist for quality, security, and maintainability. Use immediately after writing or modifying code.
 mode: subagent
 ---

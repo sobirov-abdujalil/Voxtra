@@ -1,4 +1,5 @@
 ---
+name: e2e-runner
 description: End-to-end testing specialist using Playwright. Use proactively for generating, maintaining, and running E2E tests for critical user flows.
 mode: subagent
 ---
