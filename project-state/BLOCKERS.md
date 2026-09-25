@@ -1,19 +1,25 @@
 # BLOCKERS.md — items needing the user
 
-Open gates 2026-09-24 (Task 14 release decision — `docs/release-decision.md`):
-1. **Deploy gate (OPEN)** — no public URL exists (no remote/CLI/account on
-   this machine). Manual first-deploy steps in `docs/deployment.md`; on
-   go-live: `curl /healthz` + `BASE_URL=<url> npm run e2e` twice, then fill
-   the URL into README + deployment + demo-script + demo-recording +
-   submission-checklist + submit-now. Until then Path B (localhost video).
-2. **Demo video (OPEN — runbook ready, recording is user's voice)** — Task 15
+Open gates 2026-09-25 (repo pushed to https://github.com/sobirov-abdujalil/Voxtra on main):
+1. **Demo video (OPEN — runbook ready, recording is user's voice)** — Task 15
    prep complete 2026-09-24: machine FIT (preflight 8.4% CPU), warm-up predemo
    GREEN 5/5, capture path verified (Game Bar primary; ffmpeg mic-only),
    server standing on http://localhost:3001/, `docs/recording-runbook.md`
    printed and self-contained. The take itself needs the user's voice in a
    quiet 10 minutes — reply with the file path (or "prep only" to record
    later). No `<!-- VIDEO_URL -->` filled until a verified take is uploaded.
-2. **Residual live-E2E nondeterminism (classified environmental, mitigated)** —
+2. **Deploy gate (OPEN)** — no public URL exists (repo exists, no
+   Render service/account from this machine). Manual first-deploy steps in
+   `docs/deployment.md`; on go-live: `curl /healthz` +
+   `BASE_URL=<url> npm run e2e` twice, then fill the URL into README +
+   deployment + demo-script + demo-recording + submission-checklist +
+   submit-now. Until then Path B (localhost video).
+3. **Submission not yet made (OPEN)** — form draft in
+   `docs/submission-checklist.md` + `docs/submit-now.md` (repo URL filled
+   2026-09-25); submit Sept 29 evening local time per the submission-day
+   procedure. Requires the video (gate 1) and preferably the deployed URL
+   (gate 2, else Path B).
+4. **Residual live-E2E nondeterminism (classified environmental, mitigated)** —
    15/20 legs (75%) this task; every heard utterance maps correctly, failures
    are turn-skip/reorder/replay under load. Mitigations: `npm run preflight`
    abort gate + 150s fixture tails. No user action except: keep Sept 29
@@ -31,7 +37,7 @@ None blocking the foundation or the after-action report. Upcoming items that gen
    human-mic run on the user's machine is still the only unverified leg. Manual protocol is in
    `docs/test-plan.md` (read the four drill lines aloud). Firefox/Safari resample path is
    best-effort + on-screen notice per `docs/decisions.md` (decision A); Chromium is the demo browser.
-4. **Git remote** — no remote configured. Push only when the user confirms the repository.
+4. **Git remote** — CLOSED 2026-09-25: user created https://github.com/sobirov-abdujalil/Voxtra, pushed `main` (tracking `origin/main`, SHAs match), placeholder fills pushed. No tag.
 5. **M5 deploy (OPEN, 2026-09-22)** — code is deploy-ready (same-origin build,
    `/healthz`, `render.yaml`, `BASE_URL` E2E, 133 server + 34 web tests green incl.
    all three scenarios) but no public URL exists: no GitHub remote, no `gh`/Render CLI, no platform

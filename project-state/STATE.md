@@ -1,6 +1,6 @@
-# STATE.md — Voxtra current status (honest, updated 2026-09-24)
+# STATE.md — Voxtra current status (honest, updated 2026-09-25)
 
-PROJECT COMPLETION: 74% (no change — Task 14 is diagnosis + hardening, no milestone weight; M5 deployment + M6 unclaimed — no URL)
+PROJECT COMPLETION: 74% (no change — repo existence is not M5 deployment credit and not M6 credit; M5 deployment 14 + M6 15 unclaimed — no URL, no video, no submission)
 
 ## Completion ledger
 
@@ -32,6 +32,14 @@ as a separate Foundation row in the roadmap (see the 2026-09-23 entry in
 verified but no public URL exists and the deployed E2E has not run — claiming M5
 credit now would inflate. On go-live with `BASE_URL=<url> npm run e2e` green
 (Warehouse 58/58 + Forklift 57/57 + Equipment 65/65), credit M5 partial per `docs/roadmap.md` and recompute here.)
+
+## Status: REPO PUSHED 2026-09-25 — durable home on origin/main, placeholders filled
+
+- Repo: https://github.com/sobirov-abdujalil/Voxtra, branch `main` tracking `origin/main`. Pushed 2026-09-25 (user created `origin/main`; commits 9828cb9, f0f2761, 8c37bb7, c1f4bea, 768f88b landed verified: `origin/main..HEAD` and `HEAD..origin/main` both empty, SHAs match). No tag exists. No `.env`, `node_modules/`, `dist/`, `test-results/`, `release/verification-*.txt`, or video file tracked.
+- Pre-push secret scan run post-push against the pushed range (priority check): `git log origin/main -p` for `ASSEMBLYAI_API_KEY=...` / `Bearer ...` / `sk-...` → empty; `server/ web/ e2e/` scoped scan → empty; `.env` never existed in history (only `.env.example`). CLEAN — proceeded to fills.
+- Branch reconciliation: `docs/deployment.md` `master` → `main` (2 hits, both git-branch refs). `package.json` scripts and `render.yaml` carry no branch name — untouched. No non-branch uses of "master" found.
+- Placeholder fills: `docs/submission-checklist.md` Repository URL, `docs/submit-now.md` Path A/B + form field, `docs/recording-runbook.md` outro card (short form `github.com/sobirov-abdujalil/Voxtra`). Judge-facing scan now empty (remaining hits are STATE.md historical log lines only). Fill commit `docs: fill repository URL and reconcile branch name to main` pushed; `origin/main` current.
+- Ledger stays at 74%: repo existence is not M5 deployment credit (14, needs public URL + deployed E2E twice + no-leak scans) and not M6 credit (15, needs the actual submission). Stated plainly.
 
 ## Status: TASK 15 DEMO-RECORDING PREP 2026-09-24 — runbook ready, video awaits user's voice
 
