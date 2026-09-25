@@ -20,8 +20,8 @@ nothing here is claimed as a rule certainty.
   Equipment Malfunction.
 - Deployed URL: <!-- DEPLOYED_URL --> (gate open 2026-09-23 — no public URL
   provided this turn; paste the real `https://...` on go-live).
-- Repository URL: <!-- REPO_URL --> (no remote configured 2026-09-23; make the
-  pushed repo public or shared with judges per the hackathon rules — verify
+- Repository URL: https://github.com/sobirov-abdujalil/Voxtra (pushed 2026-09-25 on branch main; make the
+  repo public or shared with judges per the hackathon rules — verify
   against hackathon rules).
 - Demo video URL: <!-- VIDEO_URL --> (intended destination: YouTube unlisted
   or Loom, recorded against localhost per `docs/demo-recording.md` — verify

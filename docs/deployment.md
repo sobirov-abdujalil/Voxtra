@@ -42,7 +42,7 @@ dashboard manually. Never paste secrets into chat.
 2. Push the current branch (no force, no history rewrite, `.env` stays
    untracked):
    `git remote add origin <repo-url>` (if step 1 was manual)
-   `git push -u origin master`
+   `git push -u origin main`
 3. In Render: New → Web Service → connect the repo.
    Build command: `npm install && npm run build --workspaces`
    Start command: `npm run start --workspace=server`
@@ -65,7 +65,7 @@ Current `DEPLOYED_URL`: _(not yet deployed — fill in on go-live)_
 
 ## Redeploy after a change
 
-Git-based: `git push origin master` → Render rebuilds and restarts.
+Git-based: `git push origin main` → Render rebuilds and restarts.
 Idempotent: redeploying the same commit must yield a working URL — verify
 with `curl <DEPLOYED_URL>/healthz` + a quick `BASE_URL=<URL> npm run e2e`
 after any infra change.

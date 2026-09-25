@@ -33,7 +33,7 @@ any flake with its turn log in `project-state/REGRESSIONS.md`.
    in traffic; `grep -R ASSEMBLYAI_API_KEY web/dist/` → empty.
 3. Replace `<!-- DEPLOYED_URL -->` with the URL in: submission form, `README.md`,
    `docs/deployment.md`, `docs/demo-script.md`, `docs/demo-recording.md`.
-4. Paste `<!-- REPO_URL -->` (public repo, or judge-shared per rules) and
+4. Paste `https://github.com/sobirov-abdujalil/Voxtra` (public repo, or judge-shared per rules) and
    `<!-- VIDEO_URL -->` (YouTube unlisted or Loom — verify hosting per rules).
 5. Pre-submission check green → review form end-to-end → Submit.
 
@@ -63,7 +63,7 @@ any flake with its turn log in `project-state/REGRESSIONS.md`.
   short-lived tokens, key never in browser. LLM maps speech → intent only;
   state/score/completion are deterministic server code.
 - Deployed URL: (A) the verified `https://...` / (B) "not deployed — see demo video"
-- Repo URL: `<!-- REPO_URL -->` (make public or judge-shared per rules)
+- Repo URL: `https://github.com/sobirov-abdujalil/Voxtra` (make public or judge-shared per rules)
 - Demo video URL: `<!-- VIDEO_URL -->`
 - Team/author: _(user fills)_ · Track: AssemblyAI Voice Agent (verify per rules)
 - LICENSE: none committed — add MIT only if rules require (see checklist).
