@@ -1,6 +1,6 @@
 # STATE.md — Voxtra current status (honest, updated 2026-09-26)
 
-PROJECT COMPLETION: 74% (no change — Render URL is live but the deployed E2E has not passed twice on the fixed build; M5 deployment 14 + M6 15 unclaimed — no video, no submission)
+PROJECT COMPLETION: 88% (M5 deployment 14 CLAIMED 2026-09-26 — two clean deployed E2E greens on the fixed build; M6 15 unclaimed — no video, no submission)
 
 ## Completion ledger
 
@@ -22,7 +22,7 @@ supported by the ledger. The honest current figure is 68%.
   deployed E2E twice + no-leak scans + marker fill). Reasoning: the deployed
   verification is the larger risk-bearing share; prep is documentation only.
 - M6 submission QA + final submission: 15 (unclaimed — requires the actual submission)
-- Current: 74%
+- Current: 88% (M5 deployment 14 CLAIMED 2026-09-26 on two clean deployed greens; M6 15 unclaimed — requires the actual submission)
 
 Milestone weights match `docs/roadmap.md` (M1 25 / M2 15 / M3 15 / M4 10 /
 M5 20 / M6 15); the 3 base points are pre-milestone foundation credit recorded
@@ -32,6 +32,15 @@ as a separate Foundation row in the roadmap (see the 2026-09-23 entry in
 verified but no public URL exists and the deployed E2E has not run — claiming M5
 credit now would inflate. On go-live with `BASE_URL=<url> npm run e2e` green
 (Warehouse 58/58 + Forklift 57/57 + Equipment 65/65), credit M5 partial per `docs/roadmap.md` and recompute here.)
+
+## Status: M5 DEPLOYMENT CLAIMED 2026-09-26 — two clean deployed greens, 88%
+
+- Second clean deployed run (this task): 5/5 GREEN, wall-clock 3:58 (preflight FIT cpu=16.6%; Equipment golden 5 turns 65/65, Forklift golden 5 turns 57/57, Warehouse golden 5 turns 58/58, both invalid-paths, no-leak asserts green in-spec, pre-drill guards HTTPS/healthz/shape + same-origin token probe green). Prior run (Task 18 run 2): 5/5 GREEN 3.9m. Two-clean-greens rule satisfied → M5 deployment (14) CLAIMED: 74% + 14 = 88%.
+- Deployed CSP verified live again this turn: `curl /` → 200 HTML with `content-security-policy: ... connect-src 'self' wss://agents.assemblyai.com`; `/healthz` 200 JSON `{"status":"ok","commit":"unknown"}`; `/api/sessions/nonexistent` JSON 404.
+- Recording runbook outro now shows the durable deployed URL ("Try it: voxtra.onrender.com — Code: github.com/sobirov-abdujalil/Voxtra"); demo-recording shot 6 outro filled with the same concrete URL. Judge-facing URL inventory: README, deployment, demo-script, demo-recording, submission-checklist, submit-now all reference voxtra.onrender.com; only `<!-- VIDEO_URL -->` remains OPEN (video not recorded — user's voice required).
+- Browser smoke test (real mic + human voice at the deployed URL) NOT performed this turn — no real mic/human voice in this environment; E2E uses fake media devices. Marked pending; the deployed E2E 5/5 is the primary evidence. If the user runs it, confirm: selection screen (VoxDrill name, three cards active) → Warehouse Start → mic prompt → mic live → session.ready greeting → one spoken turn (transcript + isolate_area + state advance + consequence + timeline row).
+- Ledger: 88%. M6 (15) unclaimed until actual submission. Remaining gates: video (not recorded), submission (not made); safe submission date September 29, deadline September 30.
+- Local server confirmed still up on http://localhost:3001/ (`/healthz` 200) for the recording session; left running.
 
 ## Status: RENDER LIVE + VOICE FIX (CSP) 2026-09-26 — URL filled, Vercel retired, deployed E2E pending redeploy
 

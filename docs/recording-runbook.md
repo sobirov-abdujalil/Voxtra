@@ -24,7 +24,7 @@ Companion to `docs/demo-recording.md`. Self-contained: follow top to bottom, no 
 
 **5 — Report (2:40–2:55, 15s).** Back to the Warehouse drill → *View after-action report*. Point at **58 / 58**, Completed (5); click the 4th entry ("Documenting the incident"), show Turn 4 (`ready_for_cleanup → documented`, +10). Say: "Every point traces to a logged turn. That is the whole pitch." *Flake: score differs from 58 → point at the evidence row and explain what the engine heard; the trust story survives a wrong turn.*
 
-**6 — Outro card (2:55–3:00, 5s).** No speech. Show a card: "Repository: github.com/sobirov-abdujalil/Voxtra — demo recorded against localhost, identical drill/engine/report." Never show an ephemeral tunnel URL here. *Flake: n/a.*
+**6 — Outro card (2:55–3:00, 5s).** No speech. Show a card: "Try it: voxtra.onrender.com — Code: github.com/sobirov-abdujalil/Voxtra" (deployed URL live 2026-09-26, proven by two clean deployed E2E greens; drill/engine/report identical to localhost). Never show an ephemeral tunnel URL here. *Flake: n/a.*
 
 ## Takes (keep rule)
 
