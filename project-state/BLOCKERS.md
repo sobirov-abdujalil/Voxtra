@@ -1,6 +1,7 @@
 # BLOCKERS.md — items needing the user
 
-Open gates 2026-09-26 (Render live at https://voxtra.onrender.com/, M5 deployment claimed → 88%; remaining: video + submission):
+Open gates 2026-09-26 (Render live at https://voxtra.onrender.com/, M5 deployment claimed → 88%; audio fix + polish landed, verification pending):
+0. **Agent audio g-g-g fix — code landed, real-mic verification OPEN (demo-blocking)** — `web/src/voice/session.ts` now schedules gaplessly per the official lite client with `PlaybackScheduler` regression cover (web 39/39). This environment has no microphone, and the E2E uses fake media devices (asserts transcripts/state, never audio quality), so clean speech is NOT yet proven. Before recording: open the deployed URL in Chromium with a real mic, confirm greeting + 3 turns clean + one barge-in clean. If still glitching, stop and report — do not record on broken audio.
 1. **Demo video (OPEN — runbook ready, recording is user's voice)** — Task 15
    prep complete 2026-09-24: machine FIT (preflight 8.4% CPU), warm-up predemo
    GREEN 5/5, capture path verified (Game Bar primary; ffmpeg mic-only),
@@ -8,12 +9,17 @@ Open gates 2026-09-26 (Render live at https://voxtra.onrender.com/, M5 deploymen
    printed and self-contained. The take itself needs the user's voice in a
    quiet 10 minutes — reply with the file path (or "prep only" to record
    later). No `<!-- VIDEO_URL -->` filled until a verified take is uploaded.
-2. **Deployed E2E verification (CLOSED 2026-09-26 — 2/2 greens, M5 claimed)** —
+2. **Deployed E2E verification (CLOSED 2026-09-26 — 2/2 greens, M5 claimed; RE-RUN pending after this push)** —
    https://voxtra.onrender.com/ runs the fixed build (CSP header verified
    again this turn); Task-18 run 2 = 5/5 GREEN (3.9m) and this-task run = 5/5
    GREEN (3:58, all goldens exact + both invalid-paths + no-leak). Two-clean-
    greens rule satisfied → M5 deployment (14) CLAIMED, ledger 88%.
    (Vercel https://web-eta-bay-67.vercel.app/ retired — static only, never submit it.)
+   NOTE 2026-09-26 (audio+polish push): the two greens above are on the pre-audio-fix
+   build. The fix is client-playback-only (no engine/scenario/prompt/schema/API change;
+   server 142 unchanged), but the deployed bundle is stale until this commit redeploys.
+   Re-run `BASE_URL=https://voxtra.onrender.com/ npm run e2e` once post-deploy; M5 credit
+   itself stands (claimed on the prior build) and is not re-claimed here.
 3. **Submission not yet made (OPEN)** — form draft in
    `docs/submission-checklist.md` + `docs/submit-now.md` (repo + deployed URLs
    filled 2026-09-26); submit Sept 29 evening local time per the submission-day

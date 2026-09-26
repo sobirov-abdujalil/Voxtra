@@ -2,6 +2,13 @@
 
 PROJECT COMPLETION: 88% (M5 deployment 14 CLAIMED 2026-09-26 — two clean deployed E2E greens on the fixed build; M6 15 unclaimed — no video, no submission)
 
+## Status: AUDIO FIX + M6-PREP POLISH 2026-09-26 — g-g-g root-caused and fixed per official docs, UI polished, 88% unchanged
+
+- Root cause (evidence-backed, official browser-integration lite client as source of truth): agent playback chained each reply.audio chunk with immediate `src.start()` on `onended`, leaving event-loop gaps between ~50ms chunks — audible as choppy "g'g'g" stutter. Ruled out: sample-rate mismatch (`createBuffer(1, n, 24000)` resampled correctly by the context), base64 corruption (round-trip green), ordering (FIFO + WS order), double-decode (none), echo/self-capture (`echoCancellation:true` + `noiseSuppression:false` already per docs). Fix: pure `PlaybackScheduler` clock (`max(playbackTime, now)` + `+= duration`, reset on interrupted) + drain-and-schedule + all-live-sources barge-in stop. Regression: `web/tests/audio-playback.test.ts` (5 tests).
+- Design polish (M6-prep, additive-only, no DOM renames): token system (7-step type Inter-first with no network request, secondary/neutral/warning/info, 3 radii, 3 shadows, motion), hero headline, Warehouse "Start here" anchor, hover states, progress pips mirror, mic pill states, report hero spans + turn pills + per-group rules + pulse + print + mobile. No web font (no CSP change), no framework/library, no new dep, no emoji, no dark mode.
+- Gates this turn: build/typecheck/lint clean, web 39/39 (34 preserved + 5 new), server 142/142 unchanged, audit 0, secret scan clean (names only). Screenshots 6/6 (`docs/screenshots/` + README) at 1920×1080 + 390×844 with no layout break.
+- NOT run this turn: live E2E local + deployed (needs key + 4-min windows + post-push redeploy) and real-mic audio verification (no mic in this environment; E2E uses fake devices and cannot catch audio quality). The fix is code-correct per the official reference and unit-pinned; the demo must still be voice-checked by the user before recording. Ledger stays 88%; M6 unclaimed.
+
 ## Completion ledger
 
 Reconciliation 2026-09-23: Task 10 reported 78% with the derivation

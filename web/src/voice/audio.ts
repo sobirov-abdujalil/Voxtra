@@ -104,6 +104,64 @@ export interface Stoppable {
 }
 
 /**
+ * Gapless playback clock (DOM-free, unit-testable).
+ *
+ * Official AssemblyAI browser-integration pattern (voice-agent-api/
+ * browser-integration, lite client): each reply.audio chunk is decoded to
+ * PCM16 24kHz and scheduled on the AudioContext clock with
+ *   playbackTime = max(playbackTime, now); src.start(playbackTime);
+ *   playbackTime += buffer.duration;
+ * On reply.done interrupted the schedule resets to now so stale audio never
+ * plays. Chaining via onended + immediate start() leaves event-loop gaps
+ * between chunks — with ~50ms agent chunks the gaps are audible as choppy
+ * stutter ("g'g'g"). This class owns that clock so session.ts cannot regress
+ * to gapful playback.
+ */
+export class PlaybackScheduler {
+  private cursor = 0;
+  private initialized = false;
+
+  get playbackTime(): number {
+    return this.cursor;
+  }
+
+  /** Next start time for a chunk arriving at currentTime. Never goes backwards. */
+  nextStart(currentTime: number): number {
+    if (!Number.isFinite(currentTime) || currentTime < 0) currentTime = 0;
+    if (!this.initialized || !Number.isFinite(this.cursor)) {
+      this.cursor = currentTime;
+      this.initialized = true;
+      return this.cursor;
+    }
+    if (this.cursor < currentTime) this.cursor = currentTime;
+    return this.cursor;
+  }
+
+  /** Advance the cursor by a played buffer duration (seconds). */
+  advance(durationSeconds: number): void {
+    if (!Number.isFinite(durationSeconds) || durationSeconds <= 0) return;
+    if (!this.initialized) {
+      this.cursor = 0;
+      this.initialized = true;
+    }
+    this.cursor += durationSeconds;
+  }
+
+  /** Schedule one chunk: returns the AudioContext `when` for src.start(when). */
+  schedule(currentTime: number, durationSeconds: number): number {
+    const start = this.nextStart(currentTime);
+    this.advance(durationSeconds);
+    return start;
+  }
+
+  /** Flush on barge-in / reply.done interrupted: stale future starts are dropped. */
+  reset(now: number): void {
+    this.cursor = Number.isFinite(now) && now >= 0 ? now : 0;
+    this.initialized = true;
+  }
+}
+
+/**
  * Barge-in queue: drops queued agent audio and stops the current source
  * when a new user turn begins.
  */

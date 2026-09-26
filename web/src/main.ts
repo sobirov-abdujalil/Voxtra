@@ -90,11 +90,25 @@ function renderScenarioState(state: unknown): void {
     const current = typeof s.current === 'string' ? s.current : '';
     setText('scenario-label', current ? humanStateLabel(current, stateLabels) : 'No session yet.');
     setText('progress-indicator', progressText(s.flags, requiredFlags));
+    renderProgressPips(s.flags, requiredFlags);
     const list = document.getElementById('drill-timeline-list');
     if (list instanceof HTMLElement && Array.isArray(s.evidence)) {
       renderDrillTimeline(list, s.evidence, stateLabels);
     }
     checkCompletedFromState(state);
+  }
+}
+
+/** Additive progress pips: visual mirror of #progress-indicator text (tests pin the text). */
+function renderProgressPips(flags: Record<string, boolean> | undefined, required: readonly string[]): void {
+  const host = document.getElementById('progress-pips');
+  if (!(host instanceof HTMLElement)) return;
+  host.innerHTML = '';
+  for (const flag of required) {
+    const pip = document.createElement('span');
+    pip.className = 'pip';
+    if (flags?.[flag] === true) pip.classList.add('done');
+    host.appendChild(pip);
   }
 }
 

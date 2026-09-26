@@ -85,8 +85,15 @@ https://www.assemblyai.com/docs/voice-agents/voice-agent-api/browser-integration
     to 24kHz when the context rate differs (Firefox/Safari path; Chromium requests 24kHz directly via
     `new AudioContext({ sampleRate: 24000 })`), fixed 480-sample (20ms) PCM16 frames posted as
     transferable ArrayBuffers, sent as `input.audio` base64 only after `session.ready`. Agent audio
-    (base64 PCM16 24kHz) is decoded via `pcm16ToFloat` into `AudioBuffer`s and played through the same
-    context; any new user turn triggers `PlaybackQueue.clearOnBargeIn()` (drop queue + stop source).
+    (base64 PCM16 24kHz, `reply.audio` in `data`) is decoded via `pcm16ToFloat` into `AudioBuffer`s
+    and scheduled gaplessly on the AudioContext clock per the official lite client
+    (`playbackTime = max(playbackTime, now); src.start(playbackTime); playbackTime += duration`;
+    pure `PlaybackScheduler` in `web/src/voice/audio.ts`, wired in `web/src/voice/session.ts`).
+    Chaining via `onended` + immediate `start()` was the 2026-09-26 g-g-g root cause (event-loop gaps
+    between ~50ms chunks are audible stutter); the clock absorbs jitter with no gap and no overlap.
+    On `reply.done interrupted` / any barge-in the queue is dropped, all live sources stopped, and
+    the clock resets to `currentTime` so stale audio never plays. Any new user turn still triggers
+    `PlaybackQueue.clearOnBargeIn()` (drop queue + stop source).
 4. **Events.** User partials (`transcript.user.delta`) + finals (`transcript.user` — note: no
      "final" in the name; substring heuristics miss it), agent audio (`reply.audio`, base64 in
      `data`), agent captions (`transcript.agent(.delta)`), tool calls (`tool.call`, `arguments`
@@ -180,7 +187,9 @@ Hash routes in the single Vite app (no router dependency; `parseHashRoute` in
   (`#scenario-label`, ids mapped via the scenario definition's `states[].label`
   with a snake_case-humanize fallback, never raw), progress indicator
   (`#progress-indicator`, "N of 5 required actions completed" from
-  `state.flags` × `completionCriteria.requiredFlags`), live transcript
+  `state.flags` × `completionCriteria.requiredFlags`) plus an additive visual
+  mirror (`#progress-pips`, five dots, `aria-hidden` — tests pin the text),
+  live transcript
   (partial italic vs final list, auto-scroll inside `#transcript-final-wrap`
   only), drill-time timeline (`#drill-timeline-list`, one row per evidence
   entry: turn, intent chip, human from→to, signed delta), barge-in cue
@@ -190,16 +199,24 @@ Hash routes in the single Vite app (no router dependency; `parseHashRoute` in
   the terminal `#open-report` CTA (shown only when completed, no
   auto-navigation). `#state` still renders raw JSON for debugging/E2E.
 - `#/report/:id` — **after-action report** (Task 4 information architecture
-  unchanged: score header, breakdown, timeline, replay).
+  unchanged: score header, breakdown, timeline, replay; 2026-09-26 polish is
+  additive only — hero `#report-score` uses `.score-num`/`.score-den` spans
+  with identical `textContent`, breakdown buttons append a `.turn-pill` span,
+  per-group colored left rules, pulse highlight, print stylesheet).
 
 Top nav: `#nav-home` → `#/`, `#nav-drill` → `#/drill`, `#nav-report` → current
 session report (enabled only after a session exists), `#back-to-drill` →
 `#/drill`. Styling is a single `<style>` block in `web/index.html` using shared
-design tokens (type scale, 4px spacing scale, one color palette) across all
-three views — no CSS framework, no new dependency. Motion is suppressed under
-`prefers-reduced-motion`; `:focus-visible` outlines mark all CTAs. No `muted`
+design tokens (7-step type with Inter-first system fallback and no web-font
+request, 4px spacing `--space-1..8`, primary + secondary + neutral + semantic
+success/warning/danger/info colors, 3 radii, 3 shadow elevations, motion
+tokens) across all three views — no CSS framework, no animation/icon library,
+no new dependency, no emoji in judge copy. Motion is suppressed under
+`prefers-reduced-motion` (plus a print stylesheet that flattens motion/color);
+`:focus-visible` outlines mark all CTAs. No `muted`
 mic state exists (the session machine has no mute control), so the indicator
-maps the six real states only.
+maps the six real states only. Screenshots: `docs/screenshots/` + README index
+(three screens × desktop/mobile).
 
 ## Security
 

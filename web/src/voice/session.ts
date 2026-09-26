@@ -5,7 +5,7 @@
  * Must be called from an explicit user gesture ("Start drill"). Nothing
  * microphone-related runs before this function is invoked (browser policy).
  */
-import { PlaybackQueue, base64ToPCM16, pcm16ToBase64, pcm16ToFloat, sanitizeTranscript } from './audio.js';
+import { PlaybackQueue, PlaybackScheduler, base64ToPCM16, pcm16ToBase64, pcm16ToFloat, sanitizeTranscript } from './audio.js';
 import { VOICE_SAMPLE_RATE } from './audio.js';
 import { classifyTranscriptEvent } from './events.js';
 import { ToolResultGate } from './tool-gate.js';
@@ -205,44 +205,80 @@ export async function startVoiceDrill(
   let ready = false;
   let stopped = false;
   let lastFinal = '';
-  let currentSrc: AudioBufferSourceNode | null = null;
+  // Gapless agent-audio clock per the official browser-integration lite
+  // client: each reply.audio chunk is scheduled at
+  //   playbackTime = max(playbackTime, now); src.start(playbackTime);
+  //   playbackTime += buffer.duration;
+  // Chaining via onended + immediate start() leaves event-loop gaps between
+  // chunks — with ~50ms agent chunks the gaps are audible as choppy stutter
+  // ("g'g'g"). All live sources are tracked so barge-in can stop them.
+  const playbackClock = new PlaybackScheduler();
+  const activeSources = new Set<AudioBufferSourceNode>();
 
   const ws = new WebSocket(url);
 
   const playNext = (): void => {
-    if (stopped || currentSrc) return;
-    const buf = playback.dequeue();
-    if (!buf) return;
-    try {
-      const float = pcm16ToFloat(buf.slice(0));
-      const audioBuf = ctx.createBuffer(1, float.length, 24000);
-      audioBuf.getChannelData(0).set(float);
-      const src = ctx.createBufferSource();
-      src.buffer = audioBuf;
-      src.connect(ctx.destination);
-      currentSrc = src;
-      playback.setCurrent({ stop: () => { try { src.stop(); } catch { /* already stopped */ } } });
-      src.onended = () => {
-        currentSrc = null;
+    if (stopped) return;
+    let buf: ArrayBuffer | undefined;
+    // Drain the FIFO queue, scheduling each chunk contiguously on the audio
+    // clock. Scheduling (not onended chaining) absorbs network jitter: late
+    // arrivals still slot at max(playbackTime, now) with no gap, no overlap.
+    while ((buf = playback.dequeue()) !== undefined) {
+      try {
+        const float = pcm16ToFloat(buf.slice(0));
+        if (float.length === 0) continue;
+        const audioBuf = ctx.createBuffer(1, float.length, VOICE_SAMPLE_RATE);
+        audioBuf.getChannelData(0).set(float);
+        const src = ctx.createBufferSource();
+        src.buffer = audioBuf;
+        src.connect(ctx.destination);
+        const now = ctx.currentTime;
+        const when = playbackClock.schedule(now, audioBuf.duration);
+        activeSources.add(src);
+        playback.setCurrent({
+          stop: () => {
+            try {
+              src.stop();
+            } catch {
+              // already stopped
+            }
+          },
+        });
+        src.onended = () => {
+          activeSources.delete(src);
+          if (activeSources.size === 0) playback.setCurrent(null);
+        };
+        src.start(when);
+      } catch (err) {
+        activeSources.clear();
         playback.setCurrent(null);
-        playNext();
-      };
-      src.start();
-    } catch (err) {
-      currentSrc = null;
-      playback.setCurrent(null);
-      report(cb, (c) => c.onError?.(`Agent audio decode failed: ${(err as Error).message}`), 'agent audio decode failed');
+        report(cb, (c) => c.onError?.(`Agent audio decode failed: ${(err as Error).message}`), 'agent audio decode failed');
+      }
     }
   };
 
   const bargeIn = (reason: string): void => {
     const { dropped, stoppedCurrent } = playback.clearOnBargeIn();
-    if (currentSrc) {
-      try { currentSrc.stop(); } catch { /* already stopped */ }
-      currentSrc = null;
+    let stoppedActive = 0;
+    for (const src of [...activeSources]) {
+      try {
+        src.stop();
+      } catch {
+        // already stopped
+      }
+      stoppedActive += 1;
+    }
+    activeSources.clear();
+    // Reset the schedule so stale future starts never play after the cut.
+    // Mirrors the official `playbackTime = audioCtx.currentTime` on
+    // reply.done interrupted.
+    try {
+      playbackClock.reset(ctx.currentTime);
+    } catch {
+      playbackClock.reset(0);
     }
     // eslint-disable-next-line no-console
-    console.error(`voice barge-in (${reason}): dropped=${dropped} stopped=${stoppedCurrent}`);
+    console.error(`voice barge-in (${reason}): dropped=${dropped} stopped=${stoppedCurrent} active=${stoppedActive}`);
   };
 
   const sendToolResult = (p: PendingTool): void => {
@@ -446,7 +482,14 @@ export async function startVoiceDrill(
       console.error(`voice source disconnect failed: ${(err as Error).message}`);
     }
     playback.clearOnBargeIn();
-    if (currentSrc) { try { currentSrc.stop(); } catch { /* ignore */ } currentSrc = null; }
+    for (const src of [...activeSources]) {
+      try {
+        src.stop();
+      } catch {
+        // ignore
+      }
+    }
+    activeSources.clear();
     stream.getTracks().forEach((t) => t.stop());
     void ctx.close().catch((err: Error) => {
       // eslint-disable-next-line no-console

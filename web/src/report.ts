@@ -79,7 +79,15 @@ function makeBreakdownButton(label: string, turns: number[], timeline: HTMLEleme
   btn.type = 'button';
   btn.className = 'breakdown-entry';
   if (turns.length > 0) btn.dataset.turns = turns.join(',');
-  btn.textContent = label;
+  // Keep the full label as text (tests/E2E assert on it), then append a
+  // small turn pill for scanning. textContent still contains the label.
+  btn.textContent = `${label} `;
+  if (turns.length > 0) {
+    const pill = document.createElement('span');
+    pill.className = 'turn-pill';
+    pill.textContent = turns.length === 1 ? `turn ${turns[0]}` : `turns ${turns.join(', ')}`;
+    btn.appendChild(pill);
+  }
   btn.addEventListener('click', () => {
     highlightTurns(timeline, turns);
   });
@@ -168,8 +176,16 @@ export function renderReport(container: HTMLElement, report: ReportData): void {
   const headline = report.headlineScore ?? report.score - bonus;
   const scoreLine = document.createElement('h2');
   scoreLine.id = 'report-score';
-  // Single textContent assignment keeps the denominator assertion simple.
-  scoreLine.textContent = `${headline} / ${report.denominator}`;
+  // Hero number with the denominator secondary: separate spans keep
+  // textContent as "65 / 65" so existing assertions still pass.
+  const numSpan = document.createElement('span');
+  numSpan.className = 'score-num';
+  numSpan.textContent = String(headline);
+  const denSpan = document.createElement('span');
+  denSpan.className = 'score-den';
+  denSpan.textContent = `/ ${report.denominator}`;
+  scoreLine.append(numSpan, document.createTextNode(' '), denSpan);
+  scoreLine.setAttribute('aria-label', `Score ${headline} out of ${report.denominator}`);
   header.appendChild(scoreLine);
   if (bonus > 0) {
     const bonusLine = document.createElement('p');

@@ -73,6 +73,15 @@
 6. **Voice loop** (`server/tests/voice.test.ts`, 20 tests): PCM16 round-trip, downsample frame counts,
    sanitizer, barge-in queue, tool schema + parse/reject paths, token shape/no-leak/400/502,
    simulated tool.call → /turn evidence shape, duplicate-submit 409.
+   Browser playback regression (`web/tests/audio-playback.test.ts`, 5 tests, 2026-09-26):
+   480-sample/960-byte decode at 24kHz, gapless scheduler contiguity (20ms chunks slot
+   with no gap/overlap), late-arrival slots at now, reset on barge-in/interrupted,
+   static wiring (gapless schedule + 24kHz buffers + echoCancellation:true /
+   noiseSuppression:false, no `currentSrc` chaining). Guards the g-g-g fix.
+7. **Screenshots** (`docs/screenshots/` + README, 2026-09-26): selection / drill
+   (2 turns) / report (5/5) at 1920×1080 + 390×844, captured from single-origin
+   `http://localhost:3001/` via text intents (no voice needed for layout). No
+   horizontal scroll, no console errors, all frozen selectors preserved.
 
 ## Manual live voice drill (Chromium; needs mic + real key)
 
