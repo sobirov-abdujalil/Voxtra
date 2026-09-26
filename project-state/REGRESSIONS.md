@@ -27,6 +27,21 @@ new `deploy.test.ts` CSP test failed pre-fix, green post-fix (server
 (8 turns 11/58 — residual turn-skip signature per the Task-13/14 tripwire,
 not this bug). Deployed proof pending Render redeploy + E2E twice.
 
+## 2026-09-26 deployed E2E on the fixed build — 9/10 legs, M5 unclaimed
+
+Fix verified live (CSP header on Render carries the new `connect-src`).
+Run 1: 4/5 (6.8m) — Warehouse 58/58 (59.4s), Forklift 57/57, both
+invalid-paths green; Equipment golden 6 turns vs strict exactly-5 (extra
+turn — same replay/split family as the Task-13/14 tripwire; engine +
+mapping correct on every completed turn). Run 2: 5/5 GREEN (3.9m) —
+Equipment 65/65 (STT variants "Taking out the power", "He's clear" mapped
+correctly), Forklift 57/57 ("11 right now" mapped correctly), Warehouse
+58/58, both invalid-paths, in-spec no-leak asserts green. Legs 9/10 (90%).
+Per the credit rule (two clean greens required) M5 deployment (14) is NOT
+claimed; ledger stays 74%. The voice path is proven live on Render — the
+remaining variance is the documented residual service-side nondeterminism,
+not product logic.
+
 ## 2026-09-20 quality gate — all resolved
 
 1. Missing `@vitest/coverage-v8` (test script used `--coverage`). Fixed: added dep.

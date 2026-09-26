@@ -8,12 +8,13 @@ Open gates 2026-09-26 (Render live at https://voxtra.onrender.com/, Vercel retir
    printed and self-contained. The take itself needs the user's voice in a
    quiet 10 minutes — reply with the file path (or "prep only" to record
    later). No `<!-- VIDEO_URL -->` filled until a verified take is uploaded.
-2. **Deployed E2E verification (OPEN — URL live, fix awaiting redeploy)** —
-   https://voxtra.onrender.com/ serves API+web correctly; the helmet-CSP voice
-   fix is committed — after push, Render redeploys, then
-   `BASE_URL=https://voxtra.onrender.com API_URL=https://voxtra.onrender.com npm run e2e`
-   twice must go 5/5 (Warehouse 58/58, Forklift 57/57, Equipment 65/65, both
-   invalid-paths, no-leak). M5 deployment (14) claims only on two clean greens.
+2. **Deployed E2E verification (OPEN — 1/2 greens, 9/10 legs)** —
+   https://voxtra.onrender.com/ runs the fixed build (CSP header verified);
+   run 1 = 4/5 (Equipment golden 6-turn extra-turn signature), run 2 = 5/5
+   GREEN (all goldens exact + both invalid-paths + no-leak). M5 deployment
+   (14) needs two clean greens — one more full-green deployed run (e.g. Sept
+   29 `submission-check`) closes it. Tripwire variance is documented
+   (REGRESSIONS.md 2026-09-26); do not weaken assertions.
    (Vercel https://web-eta-bay-67.vercel.app/ retired — static only, never submit it.)
 3. **Submission not yet made (OPEN)** — form draft in
    `docs/submission-checklist.md` + `docs/submit-now.md` (repo + deployed URLs
