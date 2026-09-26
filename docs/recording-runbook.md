@@ -2,6 +2,8 @@
 
 Companion to `docs/demo-recording.md`. Self-contained: follow top to bottom, no other doc needed while recording. Machine is FIT today (preflight 8.4% CPU, warm-up predemo GREEN 5/5, E2E leg 4.2m). Server is running: open **http://localhost:3001/#/** in Chromium, 100% zoom, single tab.
 
+Pre-demo gate: complete `docs/real-mic-check.md` (Tests A–D, real microphone, under 5 min) — do not record until all four tests pass.
+
 ## Start / stop
 
 - START: press `Win+Alt+R` (Game Bar, captures screen + system + mic, one mixed track). Confirm the recording widget appears.

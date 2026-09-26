@@ -2,6 +2,14 @@
 
 PROJECT COMPLETION: 88% (M5 deployment 14 CLAIMED 2026-09-26 — two clean deployed E2E greens on the fixed build; M6 15 unclaimed — no video, no submission)
 
+## Status: POST-FIX DEPLOYED VERIFICATION 2026-09-26 — scheduler green on Render, real-mic check pending, 88% unchanged
+
+- Deployed commit: Render auto-redeployed 688a436 (proof: `/healthz` 200 `{"status":"ok","commit":"unknown"}` — Render does not pass GIT_COMMIT, so the commit field is unusable; instead the deployed `/assets/index-CMHmMJpb.js` + `index.html` are SHA256-byte-identical to the local 688a436 build output, the bundle contains the minified PlaybackScheduler (schedule/nextStart/reset + drain-and-schedule `u.start(d)` + echoCancellation on), and `last-modified` is 1 min post-push). CSP `connect-src 'self' wss://agents.assemblyai.com` verified live.
+- Deployed E2E post-fix (this task, run once): 5/5 GREEN, wall-clock 4:01 (Task 19: 3:58 — immaterial delta, not a signal). Per-leg: Equipment golden 5 turns 65/65, Equipment invalid-path, Forklift golden 5 turns 57/57, Forklift invalid-path, Warehouse golden 5 turns 58/58; in-spec no-leak asserts green; preflight FIT (cpu 25.8%); zero flakes. No regression from the audio-scheduler change. No code touched (E2E asserts transcript/intent/state/score, never audio — correctly left unextended).
+- Real-mic checklist: new `docs/real-mic-check.md` (35 lines; Tests A greeting / B one turn / C barge-in / D three turns, each with Pass/Fail; "do not record until all four pass" at top), linked from the recording-runbook pre-demo gate. This is what unblocks the recording.
+- Local gates this turn: build/typecheck/lint clean, web 39/39, server 142/142, audit 0, secret scan clean.
+- Blockers: real-mic verification OPEN (user + mic required; recording blocked until it passes); video not recorded; submission not made (safe date Sept 29, deadline Sept 30). Ledger stays 88%; M6 unclaimed. Tree frozen pending the real-mic result.
+
 ## Status: AUDIO FIX + M6-PREP POLISH 2026-09-26 — g-g-g root-caused and fixed per official docs, UI polished, 88% unchanged
 
 - Root cause (evidence-backed, official browser-integration lite client as source of truth): agent playback chained each reply.audio chunk with immediate `src.start()` on `onended`, leaving event-loop gaps between ~50ms chunks — audible as choppy "g'g'g" stutter. Ruled out: sample-rate mismatch (`createBuffer(1, n, 24000)` resampled correctly by the context), base64 corruption (round-trip green), ordering (FIFO + WS order), double-decode (none), echo/self-capture (`echoCancellation:true` + `noiseSuppression:false` already per docs). Fix: pure `PlaybackScheduler` clock (`max(playbackTime, now)` + `+= duration`, reset on interrupted) + drain-and-schedule + all-live-sources barge-in stop. Regression: `web/tests/audio-playback.test.ts` (5 tests).

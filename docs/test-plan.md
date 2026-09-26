@@ -175,6 +175,13 @@ Then the identical golden path runs (5 turns, 58/58, evidence shape, report
 UI, no-leak, clean stop) with a 60s navigation timeout for cold starts.
 See `docs/deployment.md` for the go-live checklist.
 
+Post-audio-fix re-run (2026-09-26, commit 688a436): 5/5 GREEN in 4:01
+(Equipment 65/65 + invalid-path, Forklift 57/57 + invalid-path, Warehouse
+58/58, in-spec no-leak asserts, zero flakes) — no regression from the
+PlaybackScheduler change. The E2E uses fake media devices and asserts
+transcript/intent/state/score only; audio quality is covered by
+`docs/real-mic-check.md`, never by E2E assertions.
+
 ## Judge walkthrough (manual, M3 close-out)
 
 Server `npm run dev --workspace=server`, web `npm run dev --workspace=web` (proxy `/api` → :3001).
