@@ -1,6 +1,6 @@
 # BLOCKERS.md — items needing the user
 
-Open gates 2026-09-25 (repo pushed to https://github.com/sobirov-abdujalil/Voxtra on main):
+Open gates 2026-09-26 (Render live at https://voxtra.onrender.com/, Vercel retired):
 1. **Demo video (OPEN — runbook ready, recording is user's voice)** — Task 15
    prep complete 2026-09-24: machine FIT (preflight 8.4% CPU), warm-up predemo
    GREEN 5/5, capture path verified (Game Bar primary; ffmpeg mic-only),
@@ -8,17 +8,17 @@ Open gates 2026-09-25 (repo pushed to https://github.com/sobirov-abdujalil/Voxtr
    printed and self-contained. The take itself needs the user's voice in a
    quiet 10 minutes — reply with the file path (or "prep only" to record
    later). No `<!-- VIDEO_URL -->` filled until a verified take is uploaded.
-2. **Deploy gate (OPEN)** — no public URL exists (repo exists, no
-   Render service/account from this machine). Manual first-deploy steps in
-   `docs/deployment.md`; on go-live: `curl /healthz` +
-   `BASE_URL=<url> npm run e2e` twice, then fill the URL into README +
-   deployment + demo-script + demo-recording + submission-checklist +
-   submit-now. Until then Path B (localhost video).
+2. **Deployed E2E verification (OPEN — URL live, fix awaiting redeploy)** —
+   https://voxtra.onrender.com/ serves API+web correctly; the helmet-CSP voice
+   fix is committed — after push, Render redeploys, then
+   `BASE_URL=https://voxtra.onrender.com API_URL=https://voxtra.onrender.com npm run e2e`
+   twice must go 5/5 (Warehouse 58/58, Forklift 57/57, Equipment 65/65, both
+   invalid-paths, no-leak). M5 deployment (14) claims only on two clean greens.
+   (Vercel https://web-eta-bay-67.vercel.app/ retired — static only, never submit it.)
 3. **Submission not yet made (OPEN)** — form draft in
-   `docs/submission-checklist.md` + `docs/submit-now.md` (repo URL filled
-   2026-09-25); submit Sept 29 evening local time per the submission-day
-   procedure. Requires the video (gate 1) and preferably the deployed URL
-   (gate 2, else Path B).
+   `docs/submission-checklist.md` + `docs/submit-now.md` (repo + deployed URLs
+   filled 2026-09-26); submit Sept 29 evening local time per the submission-day
+   procedure. Requires the video (gate 1) and the gate-2 greens (else Path B).
 4. **Residual live-E2E nondeterminism (classified environmental, mitigated)** —
    15/20 legs (75%) this task; every heard utterance maps correctly, failures
    are turn-skip/reorder/replay under load. Mitigations: `npm run preflight`

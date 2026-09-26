@@ -4,9 +4,9 @@ VoxDrill is a voice-first simulation trainer for high-stakes workplace decisions
 
 ## Live demo
 
-<!-- DEPLOYED_URL -->
+https://voxtra.onrender.com/ (single Render web service: Express API + built frontend, same origin; health at `https://voxtra.onrender.com/healthz`).
 
-Local run instructions are below. The deployed public URL will replace this marker on go-live (health check at `<url>/healthz`).
+> Retired: https://web-eta-bay-67.vercel.app/ was a static-frontend-only deploy with no API — it is broken by architecture and must not be submitted.
 
 ## What makes it different
 

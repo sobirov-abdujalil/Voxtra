@@ -1,8 +1,9 @@
 # VoxDrill — Deployment (Render)
 
-> Status 2026-09-22: code is deploy-ready; no public URL yet.
-> The deploy itself is blocked on user identity (GitHub repo + Render account).
-> This doc is the exact runbook — fill in `DEPLOYED_URL` once live.
+> Status 2026-09-26: LIVE at https://voxtra.onrender.com/ (single web service).
+> Remaining: full deployed E2E twice Green after the CSP fix redeploys, then M5 credit.
+> The deploy itself was unblocked 2026-09-25/26 (user-provided URLs: repo + Render service).
+> This doc is the exact runbook — `DEPLOYED_URL=https://voxtra.onrender.com/`.
 
 ## Platform and why
 
@@ -61,7 +62,9 @@ dashboard manually. Never paste secrets into chat.
    `grep -R "ASSEMBLYAI_API_KEY" web/dist/` → nothing.
 7. Record the exact URL here and in `docs/demo-script.md`.
 
-Current `DEPLOYED_URL`: _(not yet deployed — fill in on go-live)_
+Current `DEPLOYED_URL`: https://voxtra.onrender.com/ (live 2026-09-26 — single Render web service, API + web same origin; verified `/healthz` 200 JSON, `/api/*` JSON, `POST /api/voice/token` 200).
+
+> Vercel retired (Option A, 2026-09-26): https://web-eta-bay-67.vercel.app/ served the static frontend only (no Express API; `/api/*` → Vercel 404). Vercel cannot host this backend (serverless, no persistent process, no same-origin static+API). Render is the sole deployment platform — do not submit the Vercel URL.
 
 ## Redeploy after a change
 

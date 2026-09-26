@@ -105,6 +105,12 @@
   (tag NO-GO, Path B, Sept-29 flip condition); submit-now/checklist/
   demo-recording/BLOCKERS/REGRESSIONS/STATE/decisions updated. No URL: M5
   (14) + M6 (15) unclaimed, 74% unchanged. No engine/scenario/prompt change.
+- [ ] NEXT (active): Render voice fix (CSP) + deployed E2E twice — fix committed
+  (`connect-src 'self' wss://agents.assemblyai.com`, regression test green, server
+  142/142); push to origin/main so Render redeploys; then
+  `BASE_URL=https://voxtra.onrender.com API_URL=https://voxtra.onrender.com npm run e2e`
+  twice (Warehouse 58/58 + Forklift 57/57 + Equipment 65/65 + both invalid-paths,
+  no-leak). Claim M5 deployment (14 → 88%) only on two clean greens; else record honestly.
 - [ ] NEXT (active): recording session — user records the localhost demo video per `docs/recording-runbook.md` with the server up at http://localhost:3001/ (preflight FIT first, best of three takes, Game Bar start/stop, outro card `github.com/sobirov-abdujalil/Voxtra`). Reply with the file path for verification, then the uploaded URL. Deploy gate still needs the user (BLOCKERS.md).
 - [ ] NEXT: September 29 evening — `npm run submission-check` on a calm
   machine (tag flips to go only on green → v1.0.0 + RELEASE.md + commit);

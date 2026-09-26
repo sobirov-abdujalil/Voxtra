@@ -50,7 +50,20 @@ export function createApp(config: ServerConfig, options: AppOptions = {}): expre
   app.locals.voiceMetrics = metrics;
   app.locals.commit = commit;
 
-  app.use(helmet());
+  // Helmet defaults set default-src 'self' with no connect-src, which would
+  // make the browser refuse the cross-origin voice WebSocket. The page needs
+  // same-origin /api/* ('self') plus exactly the AssemblyAI agent host —
+  // allowlisted explicitly, never a wildcard.
+  app.use(
+    helmet({
+      contentSecurityPolicy: {
+        directives: {
+          ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+          'connect-src': ["'self'", 'wss://agents.assemblyai.com'],
+        },
+      },
+    }),
+  );
   app.use(cors({ origin: config.corsOrigin }));
   app.use(express.json({ limit: '32kb' }));
 

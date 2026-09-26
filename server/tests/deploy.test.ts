@@ -68,6 +68,24 @@ describe('deploy: single-origin static serving', () => {
   });
 });
 
+describe('deploy: CSP allows the voice WebSocket', () => {
+  it('served pages carry connect-src permitting wss://agents.assemblyai.com', async () => {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'voxtra-dist-'));
+    fs.writeFileSync(path.join(dir, 'index.html'), '<html><body>VoxDrill</body></html>');
+    try {
+      const app = createApp(baseConfig, { staticDir: dir });
+      const res = await request(app).get('/');
+      const csp = res.headers['content-security-policy'] as string | undefined;
+      expect(csp).toBeDefined();
+      expect(csp).toMatch(/connect-src[^;]*'self'/);
+      expect(csp).toContain('wss://agents.assemblyai.com');
+      // No wildcard: the voice host is allowlisted explicitly.
+      expect(csp).not.toContain('*');
+    } finally {
+      fs.rmSync(dir, { recursive: true, force: true });
+    }
+  });
+});
 describe('deploy: token observability without leakage', () => {
   it('counts token hits without exposing tokens or keys', async () => {
     const fetchMock = vi.fn(async () =>

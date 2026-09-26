@@ -1,6 +1,6 @@
-# STATE.md — Voxtra current status (honest, updated 2026-09-25)
+# STATE.md — Voxtra current status (honest, updated 2026-09-26)
 
-PROJECT COMPLETION: 74% (no change — repo existence is not M5 deployment credit and not M6 credit; M5 deployment 14 + M6 15 unclaimed — no URL, no video, no submission)
+PROJECT COMPLETION: 74% (no change — Render URL is live but the deployed E2E has not passed twice on the fixed build; M5 deployment 14 + M6 15 unclaimed — no video, no submission)
 
 ## Completion ledger
 
@@ -32,6 +32,14 @@ as a separate Foundation row in the roadmap (see the 2026-09-23 entry in
 verified but no public URL exists and the deployed E2E has not run — claiming M5
 credit now would inflate. On go-live with `BASE_URL=<url> npm run e2e` green
 (Warehouse 58/58 + Forklift 57/57 + Equipment 65/65), credit M5 partial per `docs/roadmap.md` and recompute here.)
+
+## Status: RENDER LIVE + VOICE FIX (CSP) 2026-09-26 — URL filled, Vercel retired, deployed E2E pending redeploy
+
+- URLs (user-provided): Render https://voxtra.onrender.com/ (single web service, API + web same origin) and Vercel https://web-eta-bay-67.vercel.app/ (static only). Diagnosis: Render API was always healthy (`/healthz` 200 JSON, `/api/sessions/nonexistent` 404 JSON, `/` 200 HTML, unknown `/api/*` JSON 404, `POST /api/voice/token` 200 with token+wsUrl); middleware order already correct (API before static, SPA fallback excludes `/api/*` — no code change needed there). Vercel serves `/` 200 HTML but `/api/*` and `/healthz` 404 (no backend possible) — retired per Option A (docs note: must not be submitted; no vercel.json/proxy).
+- Deployed E2E run 1 (pre-fix): 2/5 — both deterministic invalid-paths green; all 3 voice goldens stuck at mic `requesting` + `Voice connection error`. Root cause (product bug, ours): `helmet()` defaults ship `default-src 'self'` with no `connect-src`, so Express-served pages (Render AND local :3001) refuse `wss://agents.assemblyai.com`. Every local green ran via Vite :5173 (no CSP) — the gate was never exercised. Isolation ladder: Node WS → `session.ready`; browser no-token/dummy-query → open; opaque-origin+real-token → open vs real-origin+real-token → 1006/1008; served-page cross-origin fetch → exact CSP `connect-src` refusal. Fix: `connect-src 'self' wss://agents.assemblyai.com` (explicit, no wildcard) in `server/src/app.ts`; TDD regression test in `server/tests/deploy.test.ts` (RED pre-fix, GREEN post-fix).
+- Post-fix proof: single-origin local probe mic `live`, turns flowing (8 turns 11/58 — residual turn-skip signature per REGRESSIONS.md, not the product bug). Local gates: build/typecheck/lint clean, server 142/142 (141 + 1 new), web 34/34, audit 0. Engine/scenario/prompts/schemas/E2E untouched; no assertion weakened.
+- Deployed-URL fills: README, deployment (banner + Current URL + retired note), demo-script, demo-recording, submission-checklist (form field + table refresh + markers), submit-now (Path A + form field). Judge-facing placeholder inventory: zero live markers (`<!-- VIDEO_URL -->` still OPEN — video not recorded).
+- NOT YET: fix commit pushed → Render redeploy → deployed E2E twice (claim M5 14 → 88% only on two clean greens). Ledger stays 74%.
 
 ## Status: REPO PUSHED 2026-09-25 — durable home on origin/main, placeholders filled
 

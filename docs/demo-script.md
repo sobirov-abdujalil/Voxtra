@@ -4,9 +4,9 @@ Rehearsed against the E2E goldens. Every spoken line below is a fixture line fro
 `e2e/fixtures/audio/` — the exact utterances the automated suite asserts — so the
 demo cannot drift from the tests. Time budget: 180 seconds total.
 
-Deployed URL (M5): _(not yet deployed — fill in the exact `https://...` on go-live
-and perform the judge run there; until then run at `http://localhost:3001` after
-`npm run build --workspaces && npm run start --workspace=server`)_.
+Deployed URL (M5): https://voxtra.onrender.com/ (live 2026-09-26; warm `/healthz` one minute before showtime — free-tier cold starts. Until the fix commit redeploys, fallback is `http://localhost:3001` after `npm run build --workspaces && npm run start --workspace=server`).
+
+> Do not demo from https://web-eta-bay-67.vercel.app/ (retired 2026-09-26 — static frontend only, no API).
 
 ## Time budget (why this split)
 

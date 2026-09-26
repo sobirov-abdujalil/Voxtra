@@ -1,5 +1,32 @@
 # REGRESSIONS.md — test/eval failures
 
+## 2026-09-26 deployed voice breakage — helmet CSP blocked the agent WebSocket (fixed, regressed)
+
+First deployed E2E (`BASE_URL=https://voxtra.onrender.com`): 2/5 — both
+deterministic API invalid-paths green; all three live voice goldens stuck at
+mic `requesting` with `Voice connection error` (45s timeout). Not a Render
+fault (`/healthz`, `/api/*` JSON, token-mint 200 all green; middleware order
+already correct) and not residual STT flakiness (identical systematic failure
+×3, zero turns, session never ready).
+
+Root cause: `helmet()` defaults emit `default-src 'self'` with no
+`connect-src`, so any page served by Express (Render AND local `:3001`)
+refuses `wss://agents.assemblyai.com`. Every local green ran via Vite `:5173`
+(no CSP header) — the single-origin gate was never exercised before deploy.
+Isolation ladder (all evidence, no guessing): Node mint→WS→`session.update`→
+`session.ready` (service/key/config fine); browser WS no-token + 2486-char
+dummy query → open (browser stack fine); opaque-origin + real token → open vs
+real-origin + real token → error/1006 (page context discriminates); page-level
+cross-origin fetch → exact Chromium message `connect-src was not explicitly
+set, so default-src is used as fallback` + `Refused to connect`.
+
+Fix: `connect-src 'self' wss://agents.assemblyai.com` (explicit host, no
+wildcard; all other helmet defaults kept) in `server/src/app.ts`. TDD:
+new `deploy.test.ts` CSP test failed pre-fix, green post-fix (server
+142/142). Post-fix single-origin local probe: mic `live`, turns flowing
+(8 turns 11/58 — residual turn-skip signature per the Task-13/14 tripwire,
+not this bug). Deployed proof pending Render redeploy + E2E twice.
+
 ## 2026-09-20 quality gate — all resolved
 
 1. Missing `@vitest/coverage-v8` (test script used `--coverage`). Fixed: added dep.

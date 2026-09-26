@@ -28,11 +28,11 @@ any flake with its turn log in `project-state/REGRESSIONS.md`.
 
 ## Path A — deployed URL available
 
-1. `curl -sS <DEPLOYED_URL>/healthz` → 200 `{ status: 'ok', ... }`.
-2. `BASE_URL=<DEPLOYED_URL> npm run e2e` **twice** → 5/5 both times, no key
+1. `curl -sS https://voxtra.onrender.com/healthz` → 200 `{ status: 'ok', ... }`.
+2. `BASE_URL=https://voxtra.onrender.com API_URL=https://voxtra.onrender.com npm run e2e` **twice** → 5/5 both times, no key
    in traffic; `grep -R ASSEMBLYAI_API_KEY web/dist/` → empty.
-3. Replace `<!-- DEPLOYED_URL -->` with the URL in: submission form, `README.md`,
-   `docs/deployment.md`, `docs/demo-script.md`, `docs/demo-recording.md`.
+3. Deployed URL https://voxtra.onrender.com/ is filled in: submission form, `README.md`,
+   `docs/deployment.md`, `docs/demo-script.md`, `docs/demo-recording.md` (done 2026-09-26).
 4. Paste `https://github.com/sobirov-abdujalil/Voxtra` (public repo, or judge-shared per rules) and
    `<!-- VIDEO_URL -->` (YouTube unlisted or Loom — verify hosting per rules).
 5. Pre-submission check green → review form end-to-end → Submit.
@@ -62,7 +62,8 @@ any flake with its turn log in `project-state/REGRESSIONS.md`.
   intent list), inline per-scenario session updates; server-minted
   short-lived tokens, key never in browser. LLM maps speech → intent only;
   state/score/completion are deterministic server code.
-- Deployed URL: (A) the verified `https://...` / (B) "not deployed — see demo video"
+- Deployed URL: (A) https://voxtra.onrender.com/ / (B) "not deployed — see demo video"
+  (never submit the retired Vercel URL https://web-eta-bay-67.vercel.app/ — static only, no API)
 - Repo URL: `https://github.com/sobirov-abdujalil/Voxtra` (make public or judge-shared per rules)
 - Demo video URL: `<!-- VIDEO_URL -->`
 - Team/author: _(user fills)_ · Track: AssemblyAI Voice Agent (verify per rules)

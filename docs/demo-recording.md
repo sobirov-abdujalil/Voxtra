@@ -5,9 +5,9 @@ the drill, engine, and report are identical locally and deployed — only the
 origin differs. Record now; swap in the deployed-URL outro card if the gate
 closes before September 29.
 
-Deployed URL (M5): <!-- DEPLOYED_URL --> (gate open 2026-09-23 — no public URL
-provided this turn; record the localhost take and re-record only the outro if
-the URL lands).
+Deployed URL (M5): https://voxtra.onrender.com/ (live 2026-09-26; the localhost take remains a legitimate artifact — origins differ, drill/engine/report identical; re-record only the outro if the URL postdates the take).
+
+> Retired: https://web-eta-bay-67.vercel.app/ (static only, no API — never record or submit it).
 
 Tooling state on this machine (verified 2026-09-23, nothing installed by the
 agent): `ffmpeg` present (N-126303), OBS Studio NOT found under
